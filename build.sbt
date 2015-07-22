@@ -16,6 +16,8 @@ publishTo := {
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 
+publishArtifact in Test := false
+
 pomExtra :=
   <url>https://github.com/jyuhuan/ycoll</url>
     <licenses>
