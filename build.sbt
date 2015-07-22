@@ -1,4 +1,4 @@
-name := "ycollection"
+name := "ycoll"
 
 version := "1.0"
 
