@@ -1,0 +1,43 @@
+/**
+ * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 7/20/15.
+ */
+
+import me.yuhuan.collection.graph.AdjacencyMapGraph
+import me.yuhuan.collection.Implicits._
+import me.yuhuan.strategy.Implicits._
+
+object GraphTest extends App {
+
+  //               L1
+  //       (0,A) ------- (3,D)
+  //    L2 / |           __/
+  //      /  |        __/
+  //   (1,B) |L5   __/
+  //      \  |  __/  L3
+  //    L4 \ | /
+  //       (2,C)
+
+
+  val g = AdjacencyMapGraph(
+    0 → "A",
+    1 → "B",
+    2 → "C",
+    3 → "D"
+  )(
+    0 → "L2" → 1,
+    0 → "L5" → 2,
+    0 → "L1" → 3,
+    1 → "L2" → 0,
+    1 → "L4" → 2,
+    2 → "L5" → 0,
+    2 → "L4" → 1,
+    2 → "L3" → 3,
+    3 → "L1" → 0,
+    3 → "L3" → 2
+  )
+
+  assert(g.outgoingIdsOf(2) == Set(0, 1, 3))
+
+  val path = g.vertexAt(0) ~~> g.vertexAt(3)
+
+}
