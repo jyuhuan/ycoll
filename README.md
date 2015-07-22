@@ -46,6 +46,12 @@ val g = AdjacencyMapGraph(
 )
 ```
 
+To search for the path from vertex `B` to `D`, write:
+
+```scala
+val path = g.vertexAt(1) ~~> g.vertexAt(3)
+```
+
 
 ## Road Map
 * Bidirectional graph
