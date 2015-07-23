@@ -103,7 +103,7 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
   def str(implicit f: StringFormatter[Graph[I, V, E]]) = f.str(this)
 
 
-  def mapVertex[V2](f: V ⇒ V2): Graph[I, V2, E] = new Graph[I, V2, E] {
+  def mapVertices[V2](f: V ⇒ V2): Graph[I, V2, E] = new Graph[I, V2, E] {
     override def apply(i: I): V2 = f(outer.apply(i))
     override def apply(i: I, j: I): E = outer.apply(i, j)
 
@@ -115,7 +115,7 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i)
   }
 
-  def mapEdge[E2](f: E ⇒ E2): Graph[I, V, E2] = new Graph[I, V, E2] {
+  def mapEdges[E2](f: E ⇒ E2): Graph[I, V, E2] = new Graph[I, V, E2] {
     override def apply(i: I): V = outer.apply(i)
     override def apply(i: I, j: I): E2 = f(outer.apply(i, j))
 
@@ -128,7 +128,7 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
   }
 
 
-  def filterVertex(f: V ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
+  def filterVertices(f: V ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
     // TODO: Wrong. Must prevent from accessing vertices that fails f. But other functions need it to be this way.
     override def apply(i: I): V = outer.apply(i)
 
@@ -143,7 +143,7 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i).filter(j ⇒ f(apply(j)))
   }
 
-  def filterEdge(f: E ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
+  def filterEdges(f: E ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
     override def apply(i: I): V = outer.apply(i)
 
     // TODO: Wrong. Must prevent from accessing edges that fails f. But other functions need it to be this way.

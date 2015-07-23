@@ -2,10 +2,9 @@
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 7/20/15.
  */
 
-import me.yuhuan.collection.graph.AdjacencyMapGraph
+import me.yuhuan.collection.graph._
 import me.yuhuan.collection.Implicits._
 import me.yuhuan.strategy.search._
-import me.yuhuan.strategy.format._
 
 object GraphTest extends App {
 
@@ -38,16 +37,16 @@ object GraphTest extends App {
   )
   val s = g.str
 
-  val g1 = g.mapEdge(s ⇒ s.replace("L", "边"))
+  val g1 = g.mapEdges(s ⇒ s.replace("L", "边"))
   val s1 = g1.str
 
-  val g2 = g.mapVertex(s ⇒ s"Node $s")
+  val g2 = g.mapVertices(s ⇒ s"Node $s")
   val s2 = g2.str
 
-  val g3 = g.filterEdge(s ⇒ Set("L2", "L1") contains s)
+  val g3 = g.filterEdges(s ⇒ Set("L2", "L1") contains s)
   val s3 = g3.str
 
-  val g4 = g.filterVertex(s ⇒ Set("A", "B") contains s)
+  val g4 = g.filterVertices(s ⇒ Set("A", "B") contains s)
   val s4 = g4.str
 
   val bp = 0
