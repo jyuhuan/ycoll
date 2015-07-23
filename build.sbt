@@ -10,7 +10,7 @@ publishMavenStyle := true
 
 isSnapshot := true
 
-resolvers += Resolver.sonatypeRepo("snapshots")
+scalacOptions in (Compile, doc) += "-diagrams"
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
