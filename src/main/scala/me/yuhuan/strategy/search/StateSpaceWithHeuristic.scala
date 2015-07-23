@@ -1,4 +1,4 @@
-package me.yuhuan.strategy
+package me.yuhuan.strategy.search
 
 /**
  * Represents a search problem in which heuristics are defined.

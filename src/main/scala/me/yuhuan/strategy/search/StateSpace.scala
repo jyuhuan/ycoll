@@ -1,4 +1,4 @@
-package me.yuhuan.strategy
+package me.yuhuan.strategy.search
 
 import scala.annotation.unchecked.{uncheckedVariance ⇒ uv}
 import scala.collection._
