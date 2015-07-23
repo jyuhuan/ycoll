@@ -2,6 +2,12 @@
 
 This library aims at providing data structures (especially collections) that the standard library of the Scala programming language does not provide. 
 
+## Maven/SBT
+The best way to use this library in your project is to add the following dependency to your `build.sbt` file:
+
+    libraryDependencies += "me.yuhuan" % "ycoll_2.11" % "0.1.1"
+
+
 ## What's in Current Release
 
 In the current release, a carefully designed representation for directed graphs, `Graph[I, V, E]`, is provided. Each **vertex** in the graph has an **index** and the corresponding **data**. Each **edge** in the graph has a **pair of vertex indices**, and the **data** it carries (usually the weight or the label of the edge). To provide maximum flexibility, the indices are generically typed as `I`, the vertex data are generically typed as `V`, and the edge data are generically typed as `E`.
