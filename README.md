@@ -83,7 +83,7 @@ One can easily output any `Graph` to a `dot` format. Simply invoke `str` on anyt
 val dot = g.str
 ```
 
-Notice that the formatter is actually implemented somewhere else rather than inside the graph, an extra import line should be added to your code, if you want `str` to work.
+Notice that the formatter is actually implemented somewhere else rather than inside the graph, so an extra import line should be added to your code, if you want `str` to work.
 
 ```scala
 import me.yuhuan.collection.graph._
