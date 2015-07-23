@@ -102,6 +102,19 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
 
   def str(implicit f: StringFormatter[Graph[I, V, E]]) = f.str(this)
 
+
+  def mapVertex[V2](f: V ⇒ V2): Graph[I, V2, E] = new Graph[I, V2, E] {
+    override def apply(i: I): V2 = f(outer.apply(i))
+    override def apply(i: I, j: I): E = outer.apply(i, j)
+
+    override def edgeIds: Set[(I, I)] = outer.edgeIds
+    override def vertexIds: Set[I] = outer.vertexIds
+
+    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingVerticesOf(i).map(v ⇒ Vertex(i))
+    override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).map(e ⇒ Edge(e.i, e.j))
+    override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i)
+  }
+
   def mapEdge[E2](f: E ⇒ E2): Graph[I, V, E2] = new Graph[I, V, E2] {
     override def apply(i: I): V = outer.apply(i)
     override def apply(i: I, j: I): E2 = f(outer.apply(i, j))
@@ -114,7 +127,36 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i)
   }
 
-  def mapVertex[V2](f: V ⇒ V2): Graph[I, V2, E] = ???
+
+  def filterVertex(f: V ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
+    // TODO: Wrong. Must prevent from accessing vertices that fails f. But other functions need it to be this way.
+    override def apply(i: I): V = outer.apply(i)
+
+    override def apply(i: I, j: I) = outer.apply(i, j)
+
+    // TODO: change both to lazy. Need to redefine the return value of edgeIds as a lazy container.
+    override def edgeIds: Set[(I, I)] = outer.edgeIds.filter(p ⇒ f(apply(p._1)) && f(apply(p._2)))
+    override def vertexIds: Set[I] = outer.vertexIds.filter(p ⇒ f(apply(p)))
+
+    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingVerticesOf(i).filter(v ⇒ f(apply(v.i))).map(v ⇒ Vertex(v.i))
+    override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).filter(p ⇒ f(apply(p.i)) && f(apply(p.j))).map(v ⇒ Edge(v.i, v.j))
+    override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i).filter(j ⇒ f(apply(j)))
+  }
+
+  def filterEdge(f: E ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
+    override def apply(i: I): V = outer.apply(i)
+
+    // TODO: Wrong. Must prevent from accessing edges that fails f. But other functions need it to be this way.
+    override def apply(i: I, j: I) = outer.apply(i, j)
+
+    // TODO: change this to lazy. Need to redefine the return value of edgeIds as a lazy container.
+    override def edgeIds: Set[(I, I)] = outer.edgeIds.filter(p ⇒ f(apply(p._1, p._2)))
+    override def vertexIds: Set[I] = outer.vertexIds
+
+    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingVerticesOf(i).filter(j ⇒ f(apply(i, j.i))).map(v ⇒ Vertex(v.i))
+    override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).filter(e ⇒ f(e.data)).map(v ⇒ Edge(v.i, v.j))
+    override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i).filter(j ⇒ f(apply(i, j)))
+  }
 
 
   /**
