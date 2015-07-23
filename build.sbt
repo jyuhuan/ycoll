@@ -1,12 +1,16 @@
 name := "ycoll"
 
-version := "0.1.1"
+version := "0.0.0-SNAPSHOT"
 
 organization := "me.yuhuan"
 
 scalaVersion := "2.11.7"
 
 publishMavenStyle := true
+
+isSnapshot := true
+
+resolvers += Resolver.sonatypeRepo("snapshots")
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
