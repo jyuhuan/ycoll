@@ -4,7 +4,8 @@
 
 import me.yuhuan.collection.graph.AdjacencyMapGraph
 import me.yuhuan.collection.Implicits._
-import me.yuhuan.strategy.Implicits._
+import me.yuhuan.strategy.search._
+import me.yuhuan.strategy.format._
 
 object GraphTest extends App {
 
@@ -35,9 +36,22 @@ object GraphTest extends App {
     3 → "L1" → 0,
     3 → "L3" → 2
   )
+  val s = g.str
 
-  assert(g.outgoingIdsOf(2) == Set(0, 1, 3))
+  val g1 = g.mapEdge(s ⇒ s.replace("L", "边"))
+  val s1 = g1.str
 
-  val path = g.vertexAt(0) ~~> g.vertexAt(3)
+  val g2 = g.mapVertex(s ⇒ s"Node $s")
+  val s2 = g2.str
+
+  val g3 = g.filterEdge(s ⇒ Set("L2", "L1") contains s)
+  val s3 = g3.str
+
+  val g4 = g.filterVertex(s ⇒ Set("A", "B") contains s)
+  val s4 = g4.str
+
+  val bp = 0
+
+
 
 }
