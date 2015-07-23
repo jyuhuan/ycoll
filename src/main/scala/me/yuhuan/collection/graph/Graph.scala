@@ -12,9 +12,10 @@ import scala.collection.Set
  * @tparam V The type of the data in an vertex.
  * @tparam E The type of the label of an edge.
  *
- * @author Tongfei Chen (ctongfei@gmail.com) and Yuhuan Jiang (jyuhuan@gmail.com).
+ * @author Tongfei Chen (ctongfei@gmail.com).
+ * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
-trait Graph[@specialized(Int) I, V, E] { outer ⇒
+trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
 
   /**
    * Gets the data of the vertex at the given index.
