@@ -67,7 +67,7 @@ Some higher-order functions are provided at the level of the `Graph` trait. The 
 
 ```scala
 // Transforming edges and vertices
-val g1 = g.mapEdges(s ⇒ s.replace("L", "边"))
+val g1 = g.mapEdges(s ⇒ s.replace("L", s.length))
 val g2 = g.mapVertices(s ⇒ s"Node $s")
 
 // Filtering edges and vertices.
