@@ -13,7 +13,7 @@ The best way to use this library in your project is to add the following depende
 
 ## What's New
 
-In the current snapshot, a carefully designed representation for directed graphs, `Graph[I, V, E]`, is provided. Each **vertex** in the graph has an **index** and the corresponding **data**. Each **edge** in the graph has a **pair of vertex indices**, and the **data** it carries (usually the weight or the label of the edge). To provide maximum flexibility, the indices are generically typed as `I`, the vertex data are generically typed as `V`, and the edge data are generically typed as `E`.
+In the current snapshot, a carefully designed representation for directed graphs, `Graph[I, V, E]`, is provided. Each **vertex** in the graph has an **index** and the corresponding **data**. Each **edge** in the graph has a **pair of vertex indices**, and the **data** it carries (usually the weight or the label of the edge). To provide maximum flexibility, the indices are generically typed as `I`, the vertex data are generically typed as `V`, and the edge data are generically typed as `E`. To provide as much efficiency as possible, `I` is specialized for `Int`, the most used type of index in many practical cases.
 
 ### Example
 Create a graph by:
