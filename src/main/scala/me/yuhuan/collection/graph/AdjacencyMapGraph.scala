@@ -63,14 +63,6 @@ class AdjacencyMapGraph[I, V, E](
 
   def edgeIds = edgeData.flatMap(p ⇒ p._2.map(q ⇒ (p._1, q._1))).toSet
 
-  def vertices = _vertices.map(v ⇒ new Vertex(v._1) {
-    override def data: (I, V) = v
-  }).toSet
-
-  def edges = edgeData.flatMap(p ⇒ p._2.map(q ⇒ new Edge(p._1, q._1) {
-    override def data = q._2
-  })).toSet
-
   def outgoingVerticesOf(i: I): Set[Vertex] = {
     if (!edgeData.contains(i)) Set()
     else edgeData(i).keys.map(k ⇒ Vertex(k)).toSet

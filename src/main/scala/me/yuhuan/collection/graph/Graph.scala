@@ -46,7 +46,7 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
    * @param j The second index of the edge.
    * @return The desired edge object.
    */
-  def edge(i: I, j: I): Edge = Edge(i, j)
+  def edgeAt(i: I, j: I): Edge = Edge(i, j)
 
   /**
    * Gets the indices of all vertices.
@@ -64,13 +64,13 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
    * Gets the vertex objects of all vertices.
    * @return A set of all vertex objects of all vertices.
    */
-  def vertices: Set[Vertex]
+  def vertices = vertexIds.view.map(i ⇒ vertexAt(i))
 
   /**
    * Gets the edge objects of all edges.
    * @return A set of edge objects of all edges.
    */
-  def edges: Set[Edge]
+  def edges = edgeIds.view.map(p ⇒ edgeAt(p._1, p._2))
 
   /**
    * Gets the indices of the outgoing vertices of the vertex at the given index.
@@ -103,13 +103,13 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
   def str(implicit f: StringFormatter[Graph[I, V, E]]) = f.str(this)
 
   def mapEdge[E2](f: E ⇒ E2): Graph[I, V, E2] = new Graph[I, V, E2] {
-    override def apply(i: I): V = outer(i)
-    override def apply(i: I, j: I): E2 = f(outer(i, j))
-    override def vertexIds: Set[I] = outer.vertexIds
+    override def apply(i: I): V = outer.apply(i)
+    override def apply(i: I, j: I): E2 = f(outer.apply(i, j))
+
     override def edgeIds: Set[(I, I)] = outer.edgeIds
-    override def vertices: Set[Vertex] = outer.vertices.map(v ⇒ Vertex(v.i))
-    override def edges: Set[Edge] = outer.edges.map(e ⇒ Edge(e.i, e.j))
-    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingEdgesOf(i).map(v ⇒ Vertex(v.i))
+    override def vertexIds: Set[I] = outer.vertexIds
+
+    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingVerticesOf(i).map(v ⇒ Vertex(i))
     override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).map(e ⇒ Edge(e.i, e.j))
     override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i)
   }
