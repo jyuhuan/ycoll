@@ -7,12 +7,14 @@ import me.yuhuan.collection.graph.Graph
  */
 package object format {
 
-
-  implicit def graphFormatter[I, V, E]: StringFormatter[Graph[I, V, E]] = new StringFormatter[Graph[I, V, E]] {
+  /**
+   * A string formatter for [[me.yuhuan.collection.graph.Graph Graph]]s.
+   */
+  implicit def stringFormatter4Graph[I, V, E]: StringFormatter[Graph[I, V, E]] = new StringFormatter[Graph[I, V, E]] {
 
     def dotOfVertex(id: String, label: String) = {
       if (label == "") id + ";"
-      else id + " [shape=box label=<" + label + ">];"
+      else id + " [label=<" + label + ">];"
     }
 
     def dotOfEdge(fromId: String, toId: String, label: String) = {
