@@ -1,6 +1,7 @@
 package me.yuhuan.collection.graph
 
 import me.yuhuan.collection.node.Node
+import me.yuhuan.strategy.format.StringFormatter
 
 import scala.collection.Set
 
@@ -98,6 +99,23 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
    * @return The out degree of the vertex queried.
    */
   def ougDegreeOf(i: I) = outgoingIdsOf(i).size
+
+  def str(implicit f: StringFormatter[Graph[I, V, E]]) = f.str(this)
+
+  def mapEdge[E2](f: E ⇒ E2): Graph[I, V, E2] = new Graph[I, V, E2] {
+    override def apply(i: I): V = outer(i)
+    override def apply(i: I, j: I): E2 = f(outer(i, j))
+    override def vertexIds: Set[I] = outer.vertexIds
+    override def edgeIds: Set[(I, I)] = outer.edgeIds
+    override def vertices: Set[Vertex] = outer.vertices.map(v ⇒ Vertex(v.i))
+    override def edges: Set[Edge] = outer.edges.map(e ⇒ Edge(e.i, e.j))
+    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingEdgesOf(i).map(v ⇒ Vertex(v.i))
+    override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).map(e ⇒ Edge(e.i, e.j))
+    override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i)
+  }
+
+  def mapVertex[V2](f: V ⇒ V2): Graph[I, V2, E] = ???
+
 
   /**
    * Represents a vertex in the graph.
