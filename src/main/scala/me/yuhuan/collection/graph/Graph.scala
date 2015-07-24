@@ -1,9 +1,8 @@
 package me.yuhuan.collection.graph
 
-import me.yuhuan.collection.graph.Graph.Vertex
 import me.yuhuan.collection.node.Node
 import me.yuhuan.strategy.format.StringFormatter
-import me.yuhuan.strategy.search.StateSpace
+import me.yuhuan.strategy.search._
 
 import scala.collection.Set
 import scala.language.higherKinds
@@ -165,6 +164,24 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
   }
 
+  def zip[V2, E2](that: Graph[I, V2, E2]): Graph[I, (V, V2), (E, E2)] = new Graph[I, (V, V2), (E, E2)] {
+    override def apply(i: I): (V, V2) = (outer(i), that(i))
+    override def apply(i: I, j: I): (E, E2) = (outer(i, j), that(i, j))
+
+    override def edgeIds: Set[(I, I)] = outer.edgeIds
+    override def vertexIds: Set[I] = outer.vertexIds
+
+    override def outgoingEdgeIdsOf(i: I): Set[(I, I)] = outer.outgoingEdgeIdsOf(i)
+    override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
+  }
+
+  /**
+   * Builds the given kind of graph that has the same vertices and edges as this graph.
+   *
+   * @param builder Builder for the desired kind of graph.
+   * @tparam G The desired graph kind.
+   * @return A graph of the given kind has the same vertices and edges as this graph.
+   */
   def to[G[_, _, _]](implicit builder: GraphBuilder[I, V @uv, E @uv, G[I, V @uv, E @uv]]): G[I, V @uv, E @uv] = {
     val b = builder
     b.addVertices(this.vertexIds.map(i ⇒ i → this(i)).toSeq: _*)
@@ -197,11 +214,8 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     def vj = vertexAt(id2)
     override def toString = s"$vi --- $data --> $vj"
   }
-}
 
-object Graph {
-//  implicit def defaultSearchSpace4Node[T]: StateSpace[Graph] = new StateSpace[Node[T]] {
-//    override def succ(x: Node[T]): Iterable[Node[T]] = x.succ
-//    override def cost(from: Node[T], to: Node[T]): Double = 1
-//  }
+  implicit def enableVertexSearching: StateSpace[Vertex] = new StateSpace[Vertex] {
+    override def succ(state: Vertex): Iterable[Vertex] = outer.outgoingVerticesOf(state.id)
+  }
 }
