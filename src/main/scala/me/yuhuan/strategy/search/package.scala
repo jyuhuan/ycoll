@@ -10,9 +10,9 @@ package object search {
    * Everything has the pathTo method for searching.
    */
   implicit class EverythingIsSearchable[S](val x: S) extends AnyVal {
-    def pathTo(goal: S)(implicit ss: StateSpaceWithHeuristic[S]) = ss.findPath(x, _ == goal)
-    def ↝(goal: S)(implicit ss: StateSpaceWithHeuristic[S]) = pathTo(goal)(ss)
-    def ~~>(goal: S)(implicit ss: StateSpaceWithHeuristic[S]) = pathTo(goal)(ss)
+    def pathTo(goal: S)(implicit ss: StateSpace[S]) = ss.findPath(x, _ == goal)
+    def ↝(goal: S)(implicit ss: StateSpace[S]) = pathTo(goal)(ss)
+    def ~~>(goal: S)(implicit ss: StateSpace[S]) = pathTo(goal)(ss)
   }
 
 }
