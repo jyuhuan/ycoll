@@ -26,12 +26,12 @@ val g = AdjacencyMapGraph(/* vertices */)(/* edges */)
 
 To create the following graph, 
 
-                L1
-        (0,A) ------- (3,D)
-     L2 / |           __/
-       /  |        __/
-    (1,B) |L5   __/
-       \  |  __/  L3
+              L1
+        (0,A)---(3,D)
+     L2 / |     /
+       /  |L5  /
+    (1,B) |   /
+       \  |  /  L3
      L4 \ | /
         (2,C)
 
