@@ -121,11 +121,17 @@ class AdjacencyMapGraph[I, V, E](
 
 }
 
-object AdjacencyMapGraph {
-  def apply[I, V, E](vertices: (I, V)*)(edges: (I, I, E)*): AdjacencyMapGraph[I, V, E] = {
+object AdjacencyMapGraph extends GraphFactory[AdjacencyMapGraph] {
+
+  override def newBuilder[I, V, E] = new GraphBuilder[I, V, E] {
     val edgeData = mutable.HashMap[I, mutable.ListMap[I, E]]()
-    val newGraph = new AdjacencyMapGraph[I, V, E](mutable.Map(vertices: _*), edgeData)
-    edges.foreach(t ⇒ newGraph.addEdge(t))
-    newGraph
+    val vertexMap = mutable.HashMap[I, V]()
+    val newGraph = new AdjacencyMapGraph[I, V, E](vertexMap, edgeData)
+
+    override def addVertex(i: I, v: V) = newGraph.addVertex(i, v)
+    override def addEdge(i: I, j: I, e: E) = newGraph.addEdge(i, j, e)
+
+    override def result: Graph[I, V, E] = newGraph
   }
+
 }
