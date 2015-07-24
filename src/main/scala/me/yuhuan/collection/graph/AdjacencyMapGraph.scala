@@ -43,7 +43,7 @@ import scala.collection._
  *
  * @tparam I The type of the index of an vertex.
  * @tparam V The type of the data in an vertex.
- * @tparam E The type of the label of an edge.
+ * @tparam E The type of the data of an edge.
  */
 class AdjacencyMapGraph[I, V, E](
   val _vertices: mutable.Map[I, V],

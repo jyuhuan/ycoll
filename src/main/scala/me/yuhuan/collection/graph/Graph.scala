@@ -11,7 +11,7 @@ import scala.collection.Set
  *
  * @tparam I The type of the index of an vertex.
  * @tparam V The type of the data in an vertex.
- * @tparam E The type of the label of an edge.
+ * @tparam E The type of the data of an edge.
  *
  * @author Tongfei Chen (ctongfei@gmail.com).
  * @author Yuhuan Jiang (jyuhuan@gmail.com).

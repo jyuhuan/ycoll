@@ -1,7 +1,14 @@
 package me.yuhuan.collection.graph
 
 /**
- * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 7/22/15.
+ * Represents a structure-mutable directed graph.
+ *
+ * @tparam I The type of the index of an vertex.
+ * @tparam V The type of the data in an vertex.
+ * @tparam E The type of the data of an edge.
+ *
+ * @author Tongfei Chen (ctongfei@gmail.com).
+ * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
 trait SMutableGraph[I, V, E] extends DMutableGraph[I, V, E] {
   /**
