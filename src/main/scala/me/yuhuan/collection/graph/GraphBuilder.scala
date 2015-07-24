@@ -9,7 +9,7 @@ package me.yuhuan.collection.graph
  *
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
-trait GraphBuilder[I, V, E, G] {
+trait GraphBuilder[-I, -V, -E, +G] {
   /**
    * Adds a vertex to the graph.
    * @param i The index of the vertex.

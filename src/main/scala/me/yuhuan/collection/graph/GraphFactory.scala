@@ -8,7 +8,7 @@ import scala.language.higherKinds
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  * @tparam G The kind of the graph.
  */
-trait GraphFactory[G[_, _, _]] {
+trait GraphFactory[+G[_, _, _]] {
   /**
    * Returns a new builder for this kind of graph.
    *
