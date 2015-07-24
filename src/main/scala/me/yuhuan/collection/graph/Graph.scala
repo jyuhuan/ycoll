@@ -175,24 +175,24 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
   /**
    * Represents a vertex in the graph.
    * Contains both the index and the data of the vertex.
-   * @param i The index of the vertex.
+   * @param id The index of the vertex.
    */
-  case class Vertex(i: I) extends Node[(I, V)] {
-    override def data: (I, V) = (i, outer(i))
-    override def succ: Iterable[Node[(I, V)]] = outer.outgoingVerticesOf(i)
-    override def toString = i + " - " + outer(i)
+  case class Vertex(id: I) extends Node[V] {
+    override def data: V = outer(id)
+    override def succ: Iterable[Node[V]] = outer.outgoingVerticesOf(id)
+    override def toString = id + " - " + outer(id)
   }
 
   /**
    * Represents an edge in the graph.
    * Contains both the indices and the data of the edge.
-   * @param i The first index of the edge.
-   * @param j The second index of the edge.
+   * @param id1 The first index of the edge.
+   * @param id2 The second index of the edge.
    */
-  case class Edge(i: I, j: I) {
-    def data = apply(i, j)
-    def vi = vertexAt(i)
-    def vj = vertexAt(j)
+  case class Edge(id1: I, id2: I) {
+    def data = apply(id1, id2)
+    def vi = vertexAt(id1)
+    def vj = vertexAt(id2)
     override def toString = s"$vi --- $data --> $vj"
   }
 }

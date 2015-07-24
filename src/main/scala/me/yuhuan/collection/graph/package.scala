@@ -26,14 +26,14 @@ package object graph {
       sb append "digraph { \n"
 
       x.vertices.foreach(v ⇒ {
-        val id = v.data._1
-        val data = v.data._2
+        val id = v.id
+        val data = v.data
         sb append dotOfVertex(id.toString, data.toString)
       })
 
       x.edges.foreach(e ⇒ {
-        val id1 = e.i
-        val id2 = e.j
+        val id1 = e.id1
+        val id2 = e.id2
         val data = e.data
         sb append dotOfEdge(id1.toString, id2.toString, data.toString)
       })
