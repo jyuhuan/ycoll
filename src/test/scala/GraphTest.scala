@@ -49,6 +49,10 @@ object GraphTest extends App {
   val g4 = g.filterVertices(s ⇒ Set("A", "B") contains s)
   val s4 = g4.str
 
+
+  import g.enableVertexSearching
+  val path = g.vertexAt(0) ~~> g.vertexAt(3)
+
   val bp = 0
 
 
