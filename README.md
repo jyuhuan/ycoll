@@ -6,8 +6,10 @@ This library aims at providing data structures (especially collections) that the
 
 The best way to use this library in your project is to add the following dependency to your `build.sbt` file:
 
-    resolvers += Resolver.sonatypeRepo("snapshots")
-    libraryDependencies += "me.yuhuan" %% "ycoll" % "0.0.0-SNAPSHOT"
+```scala
+resolvers += Resolver.sonatypeRepo("snapshots")
+libraryDependencies += "me.yuhuan" %% "ycoll" % "0.0.0-SNAPSHOT"
+```
 
 ## Features
 
