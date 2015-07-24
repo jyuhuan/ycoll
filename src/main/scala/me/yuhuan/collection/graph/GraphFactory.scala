@@ -35,19 +35,4 @@ trait GraphFactory[G[_, _, _]] {
     b.addEdges(edges: _*)
     b.result
   }
-
-  /**
-   * Creates a graph by specifying only the data of the vertices and edges.
-   * IMPORTANT: The data of the vertices should be unique.
-   *            The data of the edges should also be unique.
-   *
-   * The indices are automatically managed.
-   *
-   * @param vertices The vertices of the graph.
-   * @param edges The edges of the graph.
-   * @tparam V The type of the data in an vertex.
-   * @tparam E The type of the data of an edge.
-   * @return
-   */
-  def apply[V, E](vertices: Set[V])(edges: (V, V, E)*): Graph[Int, V, E] = ???
 }
