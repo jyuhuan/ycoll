@@ -139,7 +139,7 @@ class AdjacencyMapGraph[I, V, E](
 
 object AdjacencyMapGraph extends GraphFactory[AdjacencyMapGraph] {
 
-  override def newBuilder[I, V, E] = new GraphBuilder[I, V, E, AdjacencyMapGraph[I, V, E]] {
+  override implicit def newBuilder[I, V, E] = new GraphBuilder[I, V, E, AdjacencyMapGraph[I, V, E]] {
     val edgeData = mutable.HashMap[I, mutable.ListMap[I, E]]()
     val vertexMap = mutable.HashMap[I, V]()
     val newGraph = new AdjacencyMapGraph[I, V, E](vertexMap, edgeData)

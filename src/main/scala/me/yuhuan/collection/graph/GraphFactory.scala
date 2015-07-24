@@ -18,7 +18,7 @@ trait GraphFactory[G[_, _, _]] {
    *
    * @return A new builder for this kind of graph.
    */
-  def newBuilder[I, V, E]: GraphBuilder[I, V, E, G[I, V, E]]
+  implicit def newBuilder[I, V, E]: GraphBuilder[I, V, E, G[I, V, E]]
 
   /**
    * Creates a graph by specifying the vertices and edges.

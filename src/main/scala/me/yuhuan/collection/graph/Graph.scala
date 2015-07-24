@@ -4,6 +4,8 @@ import me.yuhuan.collection.node.Node
 import me.yuhuan.strategy.format.StringFormatter
 
 import scala.collection.Set
+import scala.language.higherKinds
+import scala.annotation.unchecked.{uncheckedVariance => uv}
 
 
 /**
@@ -160,6 +162,14 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def outgoingEdgeIdsOf(i: I) = outer.outgoingEdgeIdsOf(i)
     override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
   }
+
+  def to[G[_, _, _]](implicit builder: GraphBuilder[I, V @uv, E @uv, G[I, V @uv, E @uv]]): G[I, V @uv, E @uv] = {
+    val b = builder
+    b.addVertices(this.vertexIds.map(i ⇒ i → this(i)).toSeq: _*)
+    b.addEdges(this.edgeIds.map(p ⇒ (p._1, p._2, this(p._1, p._2))).toSeq: _*)
+    b.result
+  }
+
 
 
   /**
