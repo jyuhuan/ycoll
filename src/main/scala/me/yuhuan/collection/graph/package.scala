@@ -9,7 +9,7 @@ package object graph {
   /**
    * A string formatter for [[me.yuhuan.collection.graph.Graph Graph]]s.
    */
-  implicit def stringFormatter4Graph[I, V, E]: StringFormatter[Graph[I, V, E]] = new StringFormatter[Graph[I, V, E]] {
+  implicit def plainStringFormatter4Graph[I, V, E]: StringFormatter[Graph[I, V, E]] = new StringFormatter[Graph[I, V, E]] {
 
     def dotOfVertex(id: String, label: String) = {
       if (label == "") id + ";"
@@ -42,4 +42,6 @@ package object graph {
       sb.toString()
     }
   }
+
+  def richStringFormatter4Graph[I, V, E, Style](format: Map[I, Style]): StringFormatter[Graph[I, V, E]] = ???
 }
