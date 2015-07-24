@@ -1,7 +1,9 @@
 package me.yuhuan.collection.graph
 
+import me.yuhuan.collection.graph.Graph.Vertex
 import me.yuhuan.collection.node.Node
 import me.yuhuan.strategy.format.StringFormatter
+import me.yuhuan.strategy.search.StateSpace
 
 import scala.collection.Set
 import scala.language.higherKinds
@@ -195,4 +197,11 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     def vj = vertexAt(id2)
     override def toString = s"$vi --- $data --> $vj"
   }
+}
+
+object Graph {
+//  implicit def defaultSearchSpace4Node[T]: StateSpace[Graph] = new StateSpace[Node[T]] {
+//    override def succ(x: Node[T]): Iterable[Node[T]] = x.succ
+//    override def cost(from: Node[T], to: Node[T]): Double = 1
+//  }
 }
