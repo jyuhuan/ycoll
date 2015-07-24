@@ -1,6 +1,7 @@
 package me.yuhuan.collection.graph
 
 import scala.collection._
+import scala.language.higherKinds
 
 /**
  * An implementation of an SMutableGraph.
@@ -61,23 +62,34 @@ class AdjacencyMapGraph[I, V, E](
 
   def vertexIds = _vertices.keySet
 
-  def edgeIds = edgeData.flatMap(p ⇒ p._2.map(q ⇒ (p._1, q._1))).toSet
+  def edgeIds = {
 
-  def outgoingVerticesOf(i: I): Set[Vertex] = {
-    if (!edgeData.contains(i)) Set()
-    else edgeData(i).keys.map(k ⇒ Vertex(k)).toSet
+// WRITING IN THIS WAY IS WRONG
+//    edgeData.flatMap(p ⇒ p._2.map(q ⇒ p._1 → q._1)).toSet
+
+// INTENDED SEMANTIC:
+//    val result = mutable.HashSet[(I, I)]()
+//    for (p ← edgeData) {
+//      for (q ← p._2) {
+//        result.add(p._1 → q._1)
+//      }
+//    }
+//
+//    result.toSet
+
+
+    edgeData.toSeq.flatMap(p ⇒ p._2.toSeq.map(q ⇒ p._1 → q._1)).toSet
+
   }
 
-  def outgoingEdgesOf(i: I): Set[Edge] = {
-    if (!edgeData.contains(i)) Set()
-    else edgeData(i).map(p ⇒ new Edge(i, p._1) {
-      override def data = p._2
-    }).toSet
-  }
-
-  def outgoingIdsOf(i: I): Set[I] = {
+  def outgoingVertexIdsOf(i: I): Set[I] = {
     if (!edgeData.contains(i)) Set()
     else edgeData(i).keySet
+  }
+
+  override def outgoingEdgeIdsOf(i: I) = {
+    if (!edgeData.contains(i)) Set()
+    else edgeData(i).map(p ⇒ i → p._1).toSet
   }
 
   def edgeFromTo(i: I, j: I): E = {
@@ -92,8 +104,11 @@ class AdjacencyMapGraph[I, V, E](
 
   def addEdge(i: I, j: I, edge: E): Unit = {
     // Check if the from and to vertices are in the vertex set
-    if (!_vertices.contains(i) || !_vertices.contains(j))
+    if (!_vertices.contains(i))
       throw new Exception(s"Vertex $i does not exist! Add the $i to the graph first!")
+
+    if (!_vertices.contains(j))
+      throw new Exception(s"Vertex $j does not exist! Add the $j to the graph first!")
 
     // Add the edge.
     if (edgeData contains i) edgeData(i)(j) = edge
@@ -119,11 +134,12 @@ class AdjacencyMapGraph[I, V, E](
     edgeData(i) -= j
   }
 
+
 }
 
 object AdjacencyMapGraph extends GraphFactory[AdjacencyMapGraph] {
 
-  override def newBuilder[I, V, E] = new GraphBuilder[I, V, E] {
+  override def newBuilder[I, V, E] = new GraphBuilder[I, V, E, AdjacencyMapGraph[I, V, E]] {
     val edgeData = mutable.HashMap[I, mutable.ListMap[I, E]]()
     val vertexMap = mutable.HashMap[I, V]()
     val newGraph = new AdjacencyMapGraph[I, V, E](vertexMap, edgeData)
@@ -131,7 +147,7 @@ object AdjacencyMapGraph extends GraphFactory[AdjacencyMapGraph] {
     override def addVertex(i: I, v: V) = newGraph.addVertex(i, v)
     override def addEdge(i: I, j: I, e: E) = newGraph.addEdge(i, j, e)
 
-    override def result: Graph[I, V, E] = newGraph
+    override def result = newGraph
   }
 
 }

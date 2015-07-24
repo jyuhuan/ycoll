@@ -1,5 +1,7 @@
 package me.yuhuan.collection.graph
 
+import scala.language.higherKinds
+
 /**
  * Contains common constructors for any graph.
  *
@@ -16,7 +18,7 @@ trait GraphFactory[G[_, _, _]] {
    *
    * @return A new builder for this kind of graph.
    */
-  def newBuilder[I, V, E]: GraphBuilder[I, V, E]
+  def newBuilder[I, V, E]: GraphBuilder[I, V, E, G[I, V, E]]
 
   /**
    * Creates a graph by specifying the vertices and edges.
@@ -29,7 +31,7 @@ trait GraphFactory[G[_, _, _]] {
    *
    * @return The graph which contains the specified vertices and edges.
    */
-  def apply[I, V, E](vertices: (I, V)*)(edges: (I, I, E)*): Graph[I, V, E] = {
+  def apply[I, V, E](vertices: (I, V)*)(edges: (I, I, E)*): G[I, V, E] = {
     val b = newBuilder[I, V, E]
     b.addVertices(vertices: _*)
     b.addEdges(edges: _*)

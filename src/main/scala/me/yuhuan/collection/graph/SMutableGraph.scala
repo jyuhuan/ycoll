@@ -30,9 +30,9 @@ trait SMutableGraph[I, V, E] extends DMutableGraph[I, V, E] {
    * Adds an edge.
    * @param i The first index of the new edge.
    * @param j The second index of the new edge.
-   * @param edge The data of the enw edge.
+   * @param e The data of the enw edge.
    */
-  def addEdge(i: I, j: I, edge: E)
+  def addEdge(i: I, j: I, e: E)
   def +=(e: (I, I, E)): Unit = addEdge(e._1, e._2, e._3)
 
   /**

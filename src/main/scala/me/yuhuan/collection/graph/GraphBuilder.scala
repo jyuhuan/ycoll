@@ -9,7 +9,7 @@ package me.yuhuan.collection.graph
  *
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
-trait GraphBuilder[I, V, E] {
+trait GraphBuilder[I, V, E, G] {
   /**
    * Adds a vertex to the graph.
    * @param i The index of the vertex.
@@ -44,5 +44,5 @@ trait GraphBuilder[I, V, E] {
    * Returns the graph built from this builder.
    * @return A graph containing the vertices and edges added (if any).
    */
-  def result: Graph[I, V, E]
+  def result: G
 }

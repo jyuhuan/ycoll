@@ -77,28 +77,35 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
    * @param i The index of the vertex queried.
    * @return A set of indices of all outgoing vertices of the vertex queried.
    */
-  def outgoingIdsOf(i: I): Set[I]
+  def outgoingVertexIdsOf(i: I): Set[I]
+
+  /**
+   *
+   * @param i
+   * @return
+   */
+  def outgoingEdgeIdsOf(i: I): Set[(I, I)]
 
   /**
    * Gets the vertex objects of the outgoing vertices of the vertex at the given index.
    * @param i The index of the vertex queried.
    * @return A set of vertex objects of all outgoing vertices of the vertex queried.
    */
-  def outgoingVerticesOf(i: I): Set[Vertex]
+  def outgoingVerticesOf(i: I): Set[Vertex] = outgoingVertexIdsOf(i).map(v ⇒ vertexAt(v))
 
   /**
    * Gets the edge objects of the outgoing vertices of the vertex at the given index.
    * @param i The index of the vertex queried.
    * @return A set of edge objects of all outgoing vertices of the vertex queried.
    */
-  def outgoingEdgesOf(i: I): Set[Edge]
+  def outgoingEdgesOf(i: I): Set[Edge] = outgoingEdgeIdsOf(i).map(e ⇒ edgeAt(e._1, e._2))
 
   /**
    * The out degree of the vertex at the given index.
    * @param i The index of the vertex queried.
    * @return The out degree of the vertex queried.
    */
-  def ougDegreeOf(i: I) = outgoingIdsOf(i).size
+  def ougDegreeOf(i: I) = outgoingVertexIdsOf(i).size
 
   def str(implicit f: StringFormatter[Graph[I, V, E]]) = f.str(this)
 
@@ -110,9 +117,8 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def edgeIds: Set[(I, I)] = outer.edgeIds
     override def vertexIds: Set[I] = outer.vertexIds
 
-    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingVerticesOf(i).map(v ⇒ Vertex(i))
-    override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).map(e ⇒ Edge(e.i, e.j))
-    override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i)
+    override def outgoingEdgeIdsOf(i: I) = outer.outgoingEdgeIdsOf(i)
+    override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
   }
 
   def mapEdges[E2](f: E ⇒ E2): Graph[I, V, E2] = new Graph[I, V, E2] {
@@ -122,9 +128,8 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def edgeIds: Set[(I, I)] = outer.edgeIds
     override def vertexIds: Set[I] = outer.vertexIds
 
-    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingVerticesOf(i).map(v ⇒ Vertex(i))
-    override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).map(e ⇒ Edge(e.i, e.j))
-    override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i)
+    override def outgoingEdgeIdsOf(i: I) = outer.outgoingEdgeIdsOf(i)
+    override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
   }
 
 
@@ -138,9 +143,8 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def edgeIds: Set[(I, I)] = outer.edgeIds.filter(p ⇒ f(apply(p._1)) && f(apply(p._2)))
     override def vertexIds: Set[I] = outer.vertexIds.filter(p ⇒ f(apply(p)))
 
-    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingVerticesOf(i).filter(v ⇒ f(apply(v.i))).map(v ⇒ Vertex(v.i))
-    override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).filter(p ⇒ f(apply(p.i)) && f(apply(p.j))).map(v ⇒ Edge(v.i, v.j))
-    override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i).filter(j ⇒ f(apply(j)))
+    override def outgoingEdgeIdsOf(i: I) = outer.outgoingEdgeIdsOf(i)
+    override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
   }
 
   def filterEdges(f: E ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
@@ -153,9 +157,8 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def edgeIds: Set[(I, I)] = outer.edgeIds.filter(p ⇒ f(apply(p._1, p._2)))
     override def vertexIds: Set[I] = outer.vertexIds
 
-    override def outgoingVerticesOf(i: I): Set[Vertex] = outer.outgoingVerticesOf(i).filter(j ⇒ f(apply(i, j.i))).map(v ⇒ Vertex(v.i))
-    override def outgoingEdgesOf(i: I): Set[Edge] = outer.outgoingEdgesOf(i).filter(e ⇒ f(e.data)).map(v ⇒ Edge(v.i, v.j))
-    override def outgoingIdsOf(i: I): Set[I] = outer.outgoingIdsOf(i).filter(j ⇒ f(apply(i, j)))
+    override def outgoingEdgeIdsOf(i: I) = outer.outgoingEdgeIdsOf(i)
+    override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
   }
 
 
