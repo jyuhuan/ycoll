@@ -2,6 +2,8 @@ package me.yuhuan.strategy.search
 
 import scala.collection._
 
+
+
 /**
  * A node in the fringe of a search runtime.
  * Other names of this class in the literature are: frontier, paths, etc.
@@ -20,4 +22,7 @@ case class SearchNode[S](state: S, parent: SearchNode[S]) {
    result
   }
 }
+
+
+
 

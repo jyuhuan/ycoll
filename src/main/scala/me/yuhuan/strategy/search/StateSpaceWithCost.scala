@@ -14,5 +14,5 @@ trait StateSpaceWithCost[S] extends StateSpace[S] {
    * @return The cost.
    */
   def cost(from: S, to: S): Double
-
+  //def findPathWithCost(start: S, isGoal: S ⇒ Boolean)(implicit ss: StateSpaceWithCost[S]): Seq[S] = ???
 }
