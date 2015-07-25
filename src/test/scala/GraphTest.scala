@@ -8,50 +8,38 @@ import me.yuhuan.strategy.search._
 
 object GraphTest extends App {
 
-  //               L1
-  //       (0,A) ------- (3,D)
-  //    L2 / |           __/
-  //      /  |        __/
-  //   (1,B) |L5   __/
-  //      \  |  __/  L3
-  //    L4 \ | /
-  //       (2,C)
-
-
-  val g = AdjacencyMapGraph(
+  val graph1 = AdjacencyMapGraph(
     0 → "A",
     1 → "B",
     2 → "C",
     3 → "D"
   )(
-    0 → "L2" → 1,
-    0 → "L5" → 2,
-    0 → "L1" → 3,
-    1 → "L2" → 0,
-    1 → "L4" → 2,
-    2 → "L5" → 0,
-    2 → "L4" → 1,
-    2 → "L3" → 3,
-    3 → "L1" → 0,
-    3 → "L3" → 2
+    0 → "a" → 1,
+    0 → "ab" → 2,
+    0 → "abc" → 3,
+    2 → "abcd" → 1,
+    3 → "abcde" → 1
   )
-  val s = g.str
 
-  val g1 = g.mapEdges(s ⇒ s.replace("L", "边"))
-  val s1 = g1.str
+  val graph2 = graph1.mapEdges(e ⇒ e.length)
+                     .mapVertices(v ⇒ v match {
+                       case "A" ⇒ "N0"
+                       case "B" ⇒ "N1"
+                       case "C" ⇒ "N2"
+                       case "D" ⇒ "N3"
+                       case "E" ⇒ "N4"
+                       case _ ⇒ "Unknown"
+                     })
 
-  val g2 = g.mapVertices(s ⇒ s"Node $s")
-  val s2 = g2.str
+  val graph3 = graph1.zip(graph2)
 
-  val g3 = g.filterEdges(s ⇒ Set("L2", "L1") contains s)
-  val s3 = g3.str
+  val dot1 = graph1.str
+  val dot2 = graph2.str
+  val dot3 = graph3.str
 
-  val g4 = g.filterVertices(s ⇒ Set("A", "B") contains s)
-  val s4 = g4.str
+  import graph1.enableVertexSearching
 
-
-  import g.enableVertexSearching
-  val path = g.vertexAt(0) ~~> g.vertexAt(3)
+  val pathAB = graph1.vertexAt(0) ~~> graph1.vertexAt(1)
 
   val bp = 0
 
