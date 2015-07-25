@@ -18,7 +18,7 @@ In the current snapshot, a carefully designed representation for directed graphs
 ### Examples
 The graphs in the following picture are used in examples in this section:
 
-<img src="http://yuhuan.me/articles/img/ycoll-design/zip.png" width="600" /> 
+<img src="http://yuhuan.me/articles/img/ycoll-design/zip.png"/> 
 
 #### Creating a Graph
 
