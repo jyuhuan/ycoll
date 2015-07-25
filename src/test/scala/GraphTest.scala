@@ -41,6 +41,11 @@ object GraphTest extends App {
 
   val pathAB = graph1.vertexAt(0) ~~> graph1.vertexAt(1)
 
+
+  val graph4 = graph1.clone()
+
+
+
   val bp = 0
 
 

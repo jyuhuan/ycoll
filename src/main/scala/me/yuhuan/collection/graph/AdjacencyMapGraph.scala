@@ -134,6 +134,9 @@ class AdjacencyMapGraph[I, V, E](
     edgeData(i) -= j
   }
 
+  override def clone(): AdjacencyMapGraph[I, V, E] = {
+    new AdjacencyMapGraph[I, V, E](outer._vertices.clone(), outer.edgeData.clone())
+  }
 
 }
 
