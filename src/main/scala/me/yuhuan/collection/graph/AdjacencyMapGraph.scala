@@ -2,6 +2,7 @@ package me.yuhuan.collection.graph
 
 import scala.collection._
 import scala.language.higherKinds
+import scala.reflect.ClassTag
 
 /**
  * An implementation of an SMutableGraph.
@@ -135,7 +136,16 @@ class AdjacencyMapGraph[I, V, E](
   }
 
   override def clone(): AdjacencyMapGraph[I, V, E] = {
-    new AdjacencyMapGraph[I, V, E](outer._vertices.clone(), outer.edgeData.clone())
+    val newVertexMap = outer._vertices.clone()
+    val newEdgeData = mutable.HashMap[I, mutable.ListMap[I, E]]()
+
+    for (p ← outer.edgeData) {
+      newEdgeData += p._1 → p._2.clone()
+    }
+
+
+
+    new AdjacencyMapGraph[I, V, E](newVertexMap, newEdgeData)
   }
 
 }
