@@ -143,10 +143,10 @@ class AdjacencyMapGraph[I, V, E](
       newEdgeData += p._1 → p._2.clone()
     }
 
-
-
     new AdjacencyMapGraph[I, V, E](newVertexMap, newEdgeData)
   }
+
+  override def hashCode = 17 + _vertices.hashCode * 23 + edgeData.hashCode() * 23
 
 }
 

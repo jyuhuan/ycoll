@@ -201,7 +201,7 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
   }
 
-  override def hashCode = ???
+  override def hashCode: Int = ???
 
 
   /**
@@ -247,4 +247,5 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
   implicit def enableVertexSearching: StateSpace[Vertex] = new StateSpace[Vertex] {
     override def succ(state: Vertex): Iterable[Vertex] = outer.outgoingVerticesOf(state.id)
   }
+
 }
