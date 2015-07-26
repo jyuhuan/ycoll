@@ -2,48 +2,54 @@
  * Created by Yuhuan Jiang (jyuhuan@gmail.com) on 7/20/15.
  */
 
-import me.yuhuan.collection.graph._
+import me.yuhuan.collection.graph.AdjacencyMapGraph
 import me.yuhuan.collection.Implicits._
 import me.yuhuan.strategy.search._
 
 object GraphTest extends App {
 
-  val graph1 = AdjacencyMapGraph(
-    0 → "A",
-    1 → "B",
-    2 → "C",
-    3 → "D"
+  val graph1 = AdjacencyMapGraph[Int, String, Double](
+    0 → "S",
+    1 → "A",
+    2 → "B",
+    3 → "C",
+    4 → "D",
+    5 → "E",
+    6 → "G"
   )(
-    0 → "a" → 1,
-    0 → "ab" → 2,
-    0 → "abc" → 3,
-    2 → "abcd" → 1,
-    3 → "abcde" → 1
+    0 → 1.5 → 1,
+    0 → 2.0 → 4,
+    1 → 2.0 → 2,
+    4 → 3.0 → 5,
+    2 → 3.0 → 3,
+    5 → 2.0 → 6,
+    3 → 4.0 → 6
   )
 
-  val graph2 = graph1.mapEdges(e ⇒ e.length)
-                     .mapVertices(v ⇒ v match {
-                       case "A" ⇒ "N0"
-                       case "B" ⇒ "N1"
-                       case "C" ⇒ "N2"
-                       case "D" ⇒ "N3"
-                       case "E" ⇒ "N4"
-                       case _ ⇒ "Unknown"
-                     })
-
-  val graph3 = graph1.zip(graph2)
-
-  val dot1 = graph1.str
-  val dot2 = graph2.str
-  val dot3 = graph3.str
-
-  import graph1.enableVertexSearching
-
-  val pathAB = graph1.vertexAt(0) ~~> graph1.vertexAt(1)
 
 
-  val graph4 = graph1.clone()
 
+
+  val heuristics = Map[Int, Double](
+    0 → 100,
+    1 → 4,
+    2 → 2,
+    3 → 4,
+    4 → 4.5,
+    5 → 2,
+    6 → 0
+  )
+
+  implicit def ssh = new StateSpaceWithCostWithHeuristic[graph1.Vertex] {
+
+    override def h(x: graph1.Vertex): Double = heuristics(x.id)
+
+    override def cost(from: graph1.Vertex, to: graph1.Vertex): Double = graph1(from.id, to.id)
+
+    override def succ(state: graph1.Vertex): Iterable[graph1.Vertex] = graph1.outgoingVertexIdsOf(state.id).map(n ⇒ graph1.Vertex(n))
+  }
+
+  val pathAB = graph1.vertexAt(0) ~~> graph1.vertexAt(6)
 
 
   val bp = 0

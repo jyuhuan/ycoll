@@ -6,16 +6,18 @@ import scala.collection._
  * Represents a search problem in which heuristics are defined.
  * @tparam S The type of a state in the search problem.
  */
-trait StateSpaceWithCostWithHeuristic[S] extends StateSpaceWithCost[S] {
+trait StateSpaceWithCostWithHeuristic[S] {
   /**
    * Gets the heuristic value for the given state.
    * @param x The state in query.
    * @return The heuristic value.
    */
   def h(x: S): Double
+  def succ(state: S): Iterable[S]
+  def cost(from: S, to: S): Double
 
 
-  def findPathWithCostWithHeuristic(start: S, isGoal: S ⇒ Boolean)(implicit ss: StateSpaceWithCostWithHeuristic[S]): Seq[S] = {
+  def findPath(start: S, isGoal: S ⇒ Boolean)(implicit ss: StateSpaceWithCostWithHeuristic[S]): Seq[S] = {
 
     implicit object MinFOrder extends Ordering[SearchNodeWithGValueHValue[S]] {
       override def compare(x: SearchNodeWithGValueHValue[S], y: SearchNodeWithGValueHValue[S]): Int = if (y.f - x.f > 0) 1 else if (y.f - x.f < 0) -1 else 0
@@ -49,5 +51,7 @@ trait StateSpaceWithCostWithHeuristic[S] extends StateSpaceWithCost[S] {
     }
     if (goalSearchNode != null) goalSearchNode.history.map(_.state) else Nil
   }
+
+
 
 }

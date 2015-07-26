@@ -137,12 +137,14 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
 
 
   def filterVertices(f: V ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
-    // TODO: Wrong. Must prevent from accessing vertices that fails f. But other functions need it to be this way.
-    override def apply(i: I): V = outer.apply(i)
+
+    override def apply(i: I): V = {
+      if (!f(outer.vertexAt(i).data)) throw new Exception(s"Vertex $i does not exist!")
+      else outer.apply(i)
+    }
 
     override def apply(i: I, j: I) = outer.apply(i, j)
 
-    // TODO: change both to lazy. Need to redefine the return value of edgeIds as a lazy container.
     override def edgeIds: Set[(I, I)] = outer.edgeIds.filter(p ⇒ f(apply(p._1)) && f(apply(p._2)))
     override def vertexIds: Set[I] = outer.vertexIds.filter(p ⇒ f(apply(p)))
 
@@ -153,10 +155,12 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
   def filterEdges(f: E ⇒ Boolean): Graph[I, V, E] = new Graph[I, V, E] {
     override def apply(i: I): V = outer.apply(i)
 
-    // TODO: Wrong. Must prevent from accessing edges that fails f. But other functions need it to be this way.
-    override def apply(i: I, j: I) = outer.apply(i, j)
+    override def apply(i: I, j: I) = {
+      if (!f(outer.edgeAt(i, i).data)) throw new Exception(s"Vertex $i does not exist!")
+      else if (!f(outer.edgeAt(i, i).data)) throw new Exception(s"Vertex $j does not exist!")
+      else outer.apply(i, j)
+    }
 
-    // TODO: change this to lazy. Need to redefine the return value of edgeIds as a lazy container.
     override def edgeIds: Set[(I, I)] = outer.edgeIds.filter(p ⇒ f(apply(p._1, p._2)))
     override def vertexIds: Set[I] = outer.vertexIds
 
@@ -174,6 +178,31 @@ trait Graph[@specialized(Int) I, +V, +E] { outer ⇒
     override def outgoingEdgeIdsOf(i: I): Set[(I, I)] = outer.outgoingEdgeIdsOf(i)
     override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
   }
+
+  def zipVertices[V2, E2](that: Graph[I, V2, E2]): Graph[I, (V, V2), E] = new Graph[I, (V, V2), E] {
+    override def apply(i: I): (V, V2) = (outer(i), that(i))
+    override def apply(i: I, j: I): E = outer(i, j)
+
+    override def edgeIds: Set[(I, I)] = outer.edgeIds
+    override def vertexIds: Set[I] = outer.vertexIds
+
+    override def outgoingEdgeIdsOf(i: I): Set[(I, I)] = outer.outgoingEdgeIdsOf(i)
+    override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
+  }
+
+  def zipEdges[V2, E2](that: Graph[I, V2, E2]): Graph[I, V, (E, E2)] = new Graph[I, V, (E, E2)] {
+    override def apply(i: I): V = outer(i)
+    override def apply(i: I, j: I): (E, E2) = (outer(i, j), that(i, j))
+
+    override def edgeIds: Set[(I, I)] = outer.edgeIds
+    override def vertexIds: Set[I] = outer.vertexIds
+
+    override def outgoingEdgeIdsOf(i: I): Set[(I, I)] = outer.outgoingEdgeIdsOf(i)
+    override def outgoingVertexIdsOf(i: I): Set[I] = outer.outgoingVertexIdsOf(i)
+  }
+
+  override def hashCode = ???
+
 
   /**
    * Builds the given kind of graph that has the same vertices and edges as this graph.
