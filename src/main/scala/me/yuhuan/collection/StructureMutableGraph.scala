@@ -1,4 +1,4 @@
-package me.yuhuan.collection.graph
+package me.yuhuan.collection
 
 /**
  * Represents a structure-mutable directed graph.
@@ -10,7 +10,7 @@ package me.yuhuan.collection.graph
  * @author Tongfei Chen (ctongfei@gmail.com).
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
-trait SMutableGraph[I, V, E] extends DMutableGraph[I, V, E] {
+trait StructureMutableGraph[I, V, E] extends DataMutableGraph[I, V, E] {
   /**
    * Adds a vertex.
    * @param i The index of the new vertex.
