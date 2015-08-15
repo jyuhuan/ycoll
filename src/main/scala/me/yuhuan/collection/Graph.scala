@@ -3,7 +3,6 @@ package me.yuhuan.collection
 import me.yuhuan.collection
 import me.yuhuan.collection.builder.GraphBuilder
 import me.yuhuan.strategy.format.StringFormatter
-import me.yuhuan.strategy.search._
 
 import scala.annotation.unchecked.{uncheckedVariance ⇒ uv}
 import scala.collection.Set
@@ -243,10 +242,6 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
     def vi = vertexAt(id1)
     def vj = vertexAt(id2)
     override def toString = s"$vi --- $data --> $vj"
-  }
-
-  implicit def enableVertexSearching: StateSpace[Vertex] = new StateSpace[Vertex] {
-    override def succ(state: Vertex): Iterable[Vertex] = outer.outgoingVerticesOf(state.id)
   }
 
 }
