@@ -3,9 +3,9 @@ package me.yuhuan.collection
 /**
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
-trait BiGraph[K, +V, +E] extends Graph[K, V, E] {
-  def incomingVertexKeysOf(k: K): Iterable[K]
-  def incomingVerticesOf(i: K): Iterable[Vertex] = incomingVertexKeysOf(i).view.map(j ⇒ vertexAt(j))
-  def incomingEdgeKeysOf(i: K): Iterable[(K, K)] = incomingVertexKeysOf(i).view.map(j ⇒ i → j)
-  def incomingEdgesOf(i: K): Iterable[Edge] = incomingVertexKeysOf(i).view.map(j ⇒ edgeAt(i, j))
+trait BiGraph[K, +N, +E] extends Graph[K, N, E] {
+  def incomingNodeKeysOf(k: K): Iterable[K]
+  def incomingNodesOf(k: K): Iterable[Node] = incomingNodeKeysOf(k).view.map(j ⇒ nodeAt(j))
+  def incomingEdgeKeysOf(k: K): Iterable[(K, K)] = incomingNodeKeysOf(k).view.map(j ⇒ k → j)
+  def incomingEdgesOf(k: K): Iterable[Edge] = incomingNodeKeysOf(k).view.map(j ⇒ edgeAt(k, j))
 }

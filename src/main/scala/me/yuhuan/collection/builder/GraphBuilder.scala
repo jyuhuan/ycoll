@@ -9,7 +9,7 @@ trait GraphBuilder[-K, -V, -E, +G] {
    * @param i The index of the vertex.
    * @param v The data of the vertex.
    */
-  def addVertex(i: K, v: V)
+  def addNode(i: K, v: V)
 
   /**
    * Adds an edge to the graph.
@@ -19,14 +19,14 @@ trait GraphBuilder[-K, -V, -E, +G] {
    */
   def addEdge(i: K, j: K, e: E)
 
-  def +=(v: (K, V)) = addVertex(v._1, v._2)
+  def +=(v: (K, V)) = addNode(v._1, v._2)
   def +=(e: (K, K, E)) = addEdge(e._1, e._2, e._3)
 
   /**
    * Adds multiple vertices at once to the graph.
    * @param vs The pairs of each vertex's index and data.
    */
-  def addVertices(vs: (K, V)*) = vs foreach +=
+  def addNodes(vs: (K, V)*) = vs foreach +=
 
   /**
    * Adds multiple edges at once to the graph.

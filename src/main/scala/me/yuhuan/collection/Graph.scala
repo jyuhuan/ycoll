@@ -13,20 +13,20 @@ import scala.language.higherKinds
  * Represents a directed graph.
  *
  * @tparam K The type of the index of an vertex.
- * @tparam V The type of the data in an vertex.
+ * @tparam N The type of the data in an vertex.
  * @tparam E The type of the data of an edge.
  *
  * @author Tongfei Chen (ctongfei@gmail.com).
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
-trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
+trait Graph[@specialized(Int) K, +N, +E] { outer ⇒
 
   /**
    * Gets the data of the vertex at the given index.
    * @param i The index of the desired vertex.
    * @return The data of the desired vertex.
    */
-  def apply(i: K): V
+  def apply(i: K): N
 
   /**
    * Gets the data of the edge at the given pair of indices.
@@ -41,7 +41,7 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    * @param i The index of the vertex.
    * @return The vertex object.
    */
-  def vertexAt(i: K): Vertex = Vertex(i)
+  def nodeAt(i: K): Node = Node(i)
 
   /**
    * Gets the edge object at the given pair of indices.
@@ -55,7 +55,7 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    * Gets the indices of all vertices.
    * @return A set of indices of all vertices.
    */
-  def vertexKeys: Set[K]
+  def nodeKeys: Set[K]
 
   /**
    * Gets the index pairs of all edges.
@@ -67,7 +67,7 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    * Gets the vertex objects of all vertices.
    * @return A set of all vertex objects of all vertices.
    */
-  def vertices = vertexKeys.view.map(i ⇒ vertexAt(i))
+  def nodes = nodeKeys.view.map(i ⇒ nodeAt(i))
 
   /**
    * Gets the edge objects of all edges.
@@ -80,7 +80,7 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    * @param i The index of the vertex queried.
    * @return A set of indices of all outgoing vertices of the vertex queried.
    */
-  def outgoingVertexKeysOf(i: K): Set[K]
+  def outgoingNodeKeysOf(i: K): Set[K]
 
   /**
    *
@@ -94,7 +94,7 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    * @param i The index of the vertex queried.
    * @return A set of vertex objects of all outgoing vertices of the vertex queried.
    */
-  def outgoingVerticesOf(i: K): Set[Vertex] = outgoingVertexKeysOf(i).map(v ⇒ vertexAt(v))
+  def outgoingNodesOf(i: K): Set[Node] = outgoingNodeKeysOf(i).map(v ⇒ nodeAt(v))
 
   /**
    * Gets the edge objects of the outgoing vertices of the vertex at the given index.
@@ -108,52 +108,50 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    * @param i The index of the vertex queried.
    * @return The out degree of the vertex queried.
    */
-  def ougDegreeOf(i: K) = outgoingVertexKeysOf(i).size
+  def ougDegreeOf(i: K) = outgoingNodeKeysOf(i).size
 
-  def str(implicit f: StringFormatter[Graph[K, V, E]]) = f.str(this)
+  def str(implicit f: StringFormatter[Graph[K, N, E]]) = f.str(this)
 
 
-  def mapVertices[V2](f: V ⇒ V2): Graph[K, V2, E] = new Graph[K, V2, E] {
+  def mapNodes[V2](f: N ⇒ V2): Graph[K, V2, E] = new Graph[K, V2, E] {
     override def apply(i: K): V2 = f(outer.apply(i))
     override def apply(i: K, j: K): E = outer.apply(i, j)
 
     override def edgeKeys: Set[(K, K)] = outer.edgeKeys
-    override def vertexKeys: Set[K] = outer.vertexKeys
+    override def nodeKeys: Set[K] = outer.nodeKeys
 
     override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
-    override def outgoingVertexKeysOf(i: K): Set[K] = outer.outgoingVertexKeysOf(i)
+    override def outgoingNodeKeysOf(i: K): Set[K] = outer.outgoingNodeKeysOf(i)
   }
 
-  def mapEdges[E2](f: E ⇒ E2): Graph[K, V, E2] = new Graph[K, V, E2] {
-    override def apply(i: K): V = outer.apply(i)
+  def mapEdges[E2](f: E ⇒ E2): Graph[K, N, E2] = new Graph[K, N, E2] {
+    override def apply(i: K): N = outer.apply(i)
     override def apply(i: K, j: K): E2 = f(outer.apply(i, j))
 
     override def edgeKeys: Set[(K, K)] = outer.edgeKeys
-    override def vertexKeys: Set[K] = outer.vertexKeys
+    override def nodeKeys: Set[K] = outer.nodeKeys
 
     override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
-    override def outgoingVertexKeysOf(i: K): Set[K] = outer.outgoingVertexKeysOf(i)
+    override def outgoingNodeKeysOf(i: K): Set[K] = outer.outgoingNodeKeysOf(i)
   }
 
 
-  def filterVertices(f: V ⇒ Boolean): Graph[K, V, E] = new Graph[K, V, E] {
+  def filterNodes(f: N ⇒ Boolean): Graph[K, N, E] = new Graph[K, N, E] {
 
-    override def apply(i: K): V = {
-      if (!f(outer.vertexAt(i).data)) throw new Exception(s"Vertex $i does not exist!")
-      else outer.apply(i)
-    }
+    override def apply(i: K): N = outer.apply(i)
+
 
     override def apply(i: K, j: K) = outer.apply(i, j)
 
     override def edgeKeys: Set[(K, K)] = outer.edgeKeys.filter(p ⇒ f(apply(p._1)) && f(apply(p._2)))
-    override def vertexKeys: Set[K] = outer.vertexKeys.filter(p ⇒ f(apply(p)))
+    override def nodeKeys: Set[K] = outer.nodeKeys.filter(p ⇒ f(apply(p)))
 
     override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
-    override def outgoingVertexKeysOf(i: K): Set[K] = outer.outgoingVertexKeysOf(i)
+    override def outgoingNodeKeysOf(i: K): Set[K] = outer.outgoingNodeKeysOf(i)
   }
 
-  def filterEdges(f: E ⇒ Boolean): Graph[K, V, E] = new Graph[K, V, E] {
-    override def apply(i: K): V = outer.apply(i)
+  def filterEdges(f: E ⇒ Boolean): Graph[K, N, E] = new Graph[K, N, E] {
+    override def apply(i: K): N = outer.apply(i)
 
     override def apply(i: K, j: K) = {
       if (!f(outer.edgeAt(i, i).data)) throw new Exception(s"Vertex $i does not exist!")
@@ -162,43 +160,43 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
     }
 
     override def edgeKeys: Set[(K, K)] = outer.edgeKeys.filter(p ⇒ f(apply(p._1, p._2)))
-    override def vertexKeys: Set[K] = outer.vertexKeys
+    override def nodeKeys: Set[K] = outer.nodeKeys
 
     override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
-    override def outgoingVertexKeysOf(i: K): Set[K] = outer.outgoingVertexKeysOf(i)
+    override def outgoingNodeKeysOf(i: K): Set[K] = outer.outgoingNodeKeysOf(i)
   }
 
-  def zip[V2, E2](that: Graph[K, V2, E2]): Graph[K, (V, V2), (E, E2)] = new Graph[K, (V, V2), (E, E2)] {
-    override def apply(i: K): (V, V2) = (outer(i), that(i))
+  def zip[V2, E2](that: Graph[K, V2, E2]): Graph[K, (N, V2), (E, E2)] = new Graph[K, (N, V2), (E, E2)] {
+    override def apply(i: K): (N, V2) = (outer(i), that(i))
     override def apply(i: K, j: K): (E, E2) = (outer(i, j), that(i, j))
 
     override def edgeKeys: Set[(K, K)] = outer.edgeKeys
-    override def vertexKeys: Set[K] = outer.vertexKeys
+    override def nodeKeys: Set[K] = outer.nodeKeys
 
     override def outgoingEdgeKeysOf(i: K): Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
-    override def outgoingVertexKeysOf(i: K): Set[K] = outer.outgoingVertexKeysOf(i)
+    override def outgoingNodeKeysOf(i: K): Set[K] = outer.outgoingNodeKeysOf(i)
   }
 
-  def zipVertices[V2, E2](that: Graph[K, V2, E2]): Graph[K, (V, V2), E] = new Graph[K, (V, V2), E] {
-    override def apply(i: K): (V, V2) = (outer(i), that(i))
+  def zipNodes[V2, E2](that: Graph[K, V2, E2]): Graph[K, (N, V2), E] = new Graph[K, (N, V2), E] {
+    override def apply(i: K): (N, V2) = (outer(i), that(i))
     override def apply(i: K, j: K): E = outer(i, j)
 
     override def edgeKeys: Set[(K, K)] = outer.edgeKeys
-    override def vertexKeys: Set[K] = outer.vertexKeys
+    override def nodeKeys: Set[K] = outer.nodeKeys
 
     override def outgoingEdgeKeysOf(i: K): Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
-    override def outgoingVertexKeysOf(i: K): Set[K] = outer.outgoingVertexKeysOf(i)
+    override def outgoingNodeKeysOf(i: K): Set[K] = outer.outgoingNodeKeysOf(i)
   }
 
-  def zipEdges[V2, E2](that: Graph[K, V2, E2]): Graph[K, V, (E, E2)] = new Graph[K, V, (E, E2)] {
-    override def apply(i: K): V = outer(i)
+  def zipEdges[V2, E2](that: Graph[K, V2, E2]): Graph[K, N, (E, E2)] = new Graph[K, N, (E, E2)] {
+    override def apply(i: K): N = outer(i)
     override def apply(i: K, j: K): (E, E2) = (outer(i, j), that(i, j))
 
     override def edgeKeys: Set[(K, K)] = outer.edgeKeys
-    override def vertexKeys: Set[K] = outer.vertexKeys
+    override def nodeKeys: Set[K] = outer.nodeKeys
 
     override def outgoingEdgeKeysOf(i: K): Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
-    override def outgoingVertexKeysOf(i: K): Set[K] = outer.outgoingVertexKeysOf(i)
+    override def outgoingNodeKeysOf(i: K): Set[K] = outer.outgoingNodeKeysOf(i)
   }
 
   override def hashCode: Int = ???
@@ -211,9 +209,9 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    * @tparam G The desired graph kind.
    * @return A graph of the given kind has the same vertices and edges as this graph.
    */
-  def to[G[_, _, _]](implicit builder: GraphBuilder[K, V @uv, E @uv, G[K, V @uv, E @uv]]): G[K, V @uv, E @uv] = {
+  def to[G[_, _, _]](implicit builder: GraphBuilder[K, N @uv, E @uv, G[K, N @uv, E @uv]]): G[K, N @uv, E @uv] = {
     val b = builder
-    b.addVertices(this.vertexKeys.map(i ⇒ i → this(i)).toSeq: _*)
+    b.addNodes(this.nodeKeys.map(i ⇒ i → this(i)).toSeq: _*)
     b.addEdges(this.edgeKeys.map(p ⇒ (p._1, p._2, this(p._1, p._2))).toSeq: _*)
     b.result
   }
@@ -225,9 +223,9 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    * Contains both the index and the data of the vertex.
    * @param id The index of the vertex.
    */
-  case class Vertex(id: K) extends Node[V] {
-    override def data: V = outer(id)
-    override def succ: Iterable[Node[V]] = outer.outgoingVerticesOf(id)
+  case class Node(id: K) extends me.yuhuan.collection.Node[N] {
+    override def data: N = outer(id)
+    override def succ: Iterable[me.yuhuan.collection.Node[N]] = outer.outgoingNodesOf(id)
     override def toString = id + " - " + outer(id)
   }
 
@@ -239,8 +237,8 @@ trait Graph[@specialized(Int) K, +V, +E] { outer ⇒
    */
   case class Edge(id1: K, id2: K) {
     def data = apply(id1, id2)
-    def vi = vertexAt(id1)
-    def vj = vertexAt(id2)
+    def vi = nodeAt(id1)
+    def vj = nodeAt(id2)
     override def toString = s"$vi --- $data --> $vj"
   }
 
@@ -266,7 +264,7 @@ object Graph {
       val sb = new StringBuilder()
       sb append "digraph { \n"
 
-      x.vertices.foreach(v ⇒ {
+      x.nodes.foreach(v ⇒ {
         val id = v.id
         val data = v.data
         sb append dotOfVertex(id.toString, data.toString)

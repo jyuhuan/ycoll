@@ -35,14 +35,14 @@ trait GraphFactory[+G[_, _, _]] {
    */
   def apply[K, V, E](vertices: (K, V)*)(edges: (K, K, E)*): G[K, V, E] = {
     val b = newBuilder[K, V, E]
-    b.addVertices(vertices: _*)
+    b.addNodes(vertices: _*)
     b.addEdges(edges: _*)
     b.result
   }
 
   def apply[K, V, E](vertexMap: Map[K, V], edgeMap: Map[K, Map[K, E]]) = {
     val b = newBuilder[K, V, E]
-    vertexMap.foreach(p ⇒ b.addVertex(p._1, p._2))
+    vertexMap.foreach(p ⇒ b.addNode(p._1, p._2))
     edgeMap.foreach(p ⇒ {
       p._2.foreach(q ⇒ b.addEdge(p._1, q._1, q._2))
     })

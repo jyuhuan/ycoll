@@ -1,4 +1,4 @@
-package me.yuhuan.collection.implementation
+package me.yuhuan.collection.mutable
 
 import me.yuhuan.collection.StructureMutableGraph
 import me.yuhuan.collection.builder.GraphBuilder
@@ -9,7 +9,7 @@ import scala.language.higherKinds
 
 /**
  * An implementation of an SMutableGraph.
- * @param vertexMap a map from the index to the data of all vertices.
+ * @param nodeMap a map from the index to the data of all vertices.
  * @param edgeMap Edge like this:
  *
  *                 E.g.:
@@ -47,21 +47,21 @@ import scala.language.higherKinds
  *                 }
  *
  * @tparam K The type of the index of an vertex.
- * @tparam V The type of the data in an vertex.
+ * @tparam N The type of the data in an vertex.
  * @tparam E The type of the data of an edge.
  */
-class AdjacencyMapGraph[K, V, E] private(vertexMap: mutable.HashMap[K, V], edgeMap: mutable.HashMap[K, mutable.ListMap[K, E]])
-  extends StructureMutableGraph[K, V, E] { outer ⇒
+class AdjacencyMapGraph[K, N, E] private(nodeMap: mutable.HashMap[K, N], edgeMap: mutable.HashMap[K, mutable.ListMap[K, E]])
+  extends StructureMutableGraph[K, N, E] { outer ⇒
 
-  def apply(i: K) = vertexMap(i)
+  def apply(i: K) = nodeMap(i)
 
   def apply(i: K, j: K) = edgeFromTo(i, j)
 
   def update(i: K, j: K, e: E): Unit = edgeMap(i)(j) = e
 
-  def update(i: K, v: V): Unit = vertexMap(i) = v
+  def update(i: K, v: N): Unit = nodeMap(i) = v
 
-  def vertexKeys = vertexMap.keySet
+  def nodeKeys = nodeMap.keySet
 
   def edgeKeys = {
 
@@ -83,7 +83,7 @@ class AdjacencyMapGraph[K, V, E] private(vertexMap: mutable.HashMap[K, V], edgeM
 
   }
 
-  def outgoingVertexKeysOf(i: K): Set[K] = {
+  def outgoingNodeKeysOf(i: K): Set[K] = {
     if (!edgeMap.contains(i)) Set()
     else edgeMap(i).keySet
   }
@@ -105,10 +105,10 @@ class AdjacencyMapGraph[K, V, E] private(vertexMap: mutable.HashMap[K, V], edgeM
 
   def addEdge(i: K, j: K, edge: E): Unit = {
     // Check if the from and to vertices are in the vertex set
-    if (!vertexMap.contains(i))
+    if (!nodeMap.contains(i))
       throw new Exception(s"Vertex $i does not exist! Add the $i to the graph first!")
 
-    if (!vertexMap.contains(j))
+    if (!nodeMap.contains(j))
       throw new Exception(s"Vertex $j does not exist! Add the $j to the graph first!")
 
     // Add the edge.
@@ -116,13 +116,13 @@ class AdjacencyMapGraph[K, V, E] private(vertexMap: mutable.HashMap[K, V], edgeM
     else edgeMap(i) = mutable.ListMap[K, E](j → edge)
   }
 
-  def addVertex(i: K, v: V): Unit = vertexMap(i) = v
+  def addNode(i: K, v: N): Unit = nodeMap(i) = v
 
-  def addVertex(v: (K, V)): Unit = addVertex(v._1, v._2)
+  def addVertex(v: (K, N)): Unit = addNode(v._1, v._2)
 
   def removeVertexAt(i: K) = {
     // remove the vertex from _vertices
-    vertexMap -= i
+    nodeMap -= i
 
     // remove outgoing edges of the vertex
     edgeMap -= i
@@ -135,29 +135,29 @@ class AdjacencyMapGraph[K, V, E] private(vertexMap: mutable.HashMap[K, V], edgeM
     edgeMap(i) -= j
   }
 
-  override def clone(): AdjacencyMapGraph[K, V, E] = {
-    val newVertexMap = outer.vertexMap.clone()
+  override def clone(): AdjacencyMapGraph[K, N, E] = {
+    val newVertexMap = outer.nodeMap.clone()
     val newEdgeData = mutable.HashMap[K, mutable.ListMap[K, E]]()
 
     for (p ← outer.edgeMap) {
       newEdgeData += p._1 → p._2.clone()
     }
 
-    new AdjacencyMapGraph[K, V, E](newVertexMap, newEdgeData)
+    new AdjacencyMapGraph[K, N, E](newVertexMap, newEdgeData)
   }
 
-  override def hashCode = 17 + vertexMap.hashCode * 23 + edgeMap.hashCode() * 23
+  override def hashCode = 17 + nodeMap.hashCode * 23 + edgeMap.hashCode() * 23
 
 }
 
 object AdjacencyMapGraph extends GraphFactory[AdjacencyMapGraph] {
 
   override implicit def newBuilder[I, V, E] = new GraphBuilder[I, V, E, AdjacencyMapGraph[I, V, E]] {
-    val vertexMap = mutable.HashMap[I, V]()
+    val nodeGraph = mutable.HashMap[I, V]()
     val edgeMap = mutable.HashMap[I, mutable.ListMap[I, E]]()
 
-    val newGraph = new AdjacencyMapGraph[I, V, E](vertexMap, edgeMap)
-    override def addVertex(i: I, v: V) = newGraph.addVertex(i, v)
+    val newGraph = new AdjacencyMapGraph[I, V, E](nodeGraph, edgeMap)
+    override def addNode(i: I, v: V) = newGraph.addNode(i, v)
     override def addEdge(i: I, j: I, e: E) = newGraph.addEdge(i, j, e)
     override def result = newGraph
   }
