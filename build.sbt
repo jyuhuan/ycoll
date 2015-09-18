@@ -20,6 +20,11 @@ publishTo := {
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 
+resolvers += Resolver.sonatypeRepo("snapshots")
+libraryDependencies += "me.yuhuan" %% "yalg" % "0.0.1-SNAPSHOT"
+
+
+
 publishArtifact in Test := false
 
 pomExtra :=

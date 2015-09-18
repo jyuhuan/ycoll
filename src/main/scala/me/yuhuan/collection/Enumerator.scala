@@ -1,6 +1,6 @@
 package me.yuhuan.collection
 
-import me.yuhuan.collection.basicimp.ResizableArray
+import me.yuhuan.collection.basicimpl.GrowableArray$
 
 /**
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
