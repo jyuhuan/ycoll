@@ -1,6 +1,5 @@
 package me.yuhuan.collection
 
-import me.yuhuan.collection.basicimpl.GrowableArray$
 
 /**
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
@@ -8,6 +7,16 @@ import me.yuhuan.collection.basicimpl.GrowableArray$
 trait Enumerator[+X] { outer ⇒
   def moveNext(): Boolean
   def current: X
+
+  def head: X = ???
+  def headOption: Option[X] = ???
+
+  def tail: Enumerator[X] = ???
+
+  def last: X = ???
+  def lastOption: Option[X] = ???
+
+  def init: Enumerator[X] = ???
 
   def map[Y](f: X ⇒ Y): Enumerator[Y] = new Enumerator[Y] {
     def moveNext(): Boolean = outer.moveNext()
@@ -41,6 +50,18 @@ trait Enumerator[+X] { outer ⇒
   }
 
   def whereNot(p: X ⇒ Boolean): Enumerator[X] = where(a => !p(a))
+
+  def groupBy[K, Y >: X](f: X ⇒ K): Map[K, Set[Y]] = ???
+
+  def foldLeft[Y](y: Y)(f: (Y, X) ⇒ Y): Y = ???
+  def foldRight[Y](f: (X, Y) ⇒ Y)(y: Y): Y = ???
+  def fold[Y >: X](y: Y)(f: (Y, Y) ⇒ Y): Y = ???
+
+  def reduceLeft[Y >: X](f: (Y, Y) ⇒ Y): Y = ???
+  def reduceRight[Y >: X](f: (Y, Y) ⇒ Y): Y = ???
+
+  def scanLeft[Y](y: Y)(f: (Y, X) ⇒ Y): Enumerator[Y] = ???
+  def scanRight[Y](f: (X, Y) ⇒ Y)(y: Y): Enumerator[Y] = ???
 
   def prepend[Y >: X](y: Y): Enumerator[Y] = new Enumerator[Y] {
     var isInOriginalRange = false

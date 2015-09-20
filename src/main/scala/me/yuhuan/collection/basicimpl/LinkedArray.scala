@@ -2,6 +2,7 @@ package me.yuhuan.collection.basicimpl
 
 import me.yuhuan.collection.{Enumerator, Enumerable}
 import me.yuhuan.collection.nodes.PrevNextNode
+import me.yuhuan.collection.default
 
 /**
  * @author Yuhuan Jiang (jyuhuan@gmail.com).

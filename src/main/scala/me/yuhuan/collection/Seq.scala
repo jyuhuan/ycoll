@@ -4,7 +4,7 @@ import me.yuhuan.algebra.Equality
 
 /**
  * Represents a sequence.
- * A sequence is different from `Enumerable`s in that elements in a sequence has an index,
+ * A sequence is different from `Enumerable`s in that each element in a sequence has an index,
  * while there isn't such element order defined in an `Enumerable`.
  *
  * @tparam A Type of elements in the sequence.
