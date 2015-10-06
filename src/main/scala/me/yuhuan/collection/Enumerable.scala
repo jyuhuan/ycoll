@@ -3,39 +3,39 @@ package me.yuhuan.collection
 /**
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
-trait Readable[+X] extends HasForeach[X] { outer ⇒
+trait Enumerable[+X] extends HasForeach[X] { outer ⇒
 
-  def newEnumerator: Reader[X]
+  def newEnumerator: Enumerator[X]
 
   def foreach[Y](f: (X ⇒ Y)): Unit = {
     val e = outer.newEnumerator
     while (true) {
-      e.read match {
+      e.next match {
         case Some(x) ⇒ f(x)
         case None ⇒ return
       }
     }
   }
 
-  def map[Y](f: (X ⇒ Y)): Readable[Y] = new Readable[Y] {
+  def map[Y](f: (X ⇒ Y)): Enumerable[Y] = new Enumerable[Y] {
     val e = outer.newEnumerator
-    def newEnumerator: Reader[Y] = new Reader[Y] {
-      def read: Option[Y] = e.read.map(f)
+    def newEnumerator: Enumerator[Y] = new Enumerator[Y] {
+      def next: Option[Y] = e.next.map(f)
     }
   }
 
-  def flatMap[Y](f: (X ⇒ Readable[Y])) = new Readable[Y] {
-    val e: Reader[X] = outer.newEnumerator
-    var ə: Reader[Y] = Reader.empty
-    def newEnumerator: Reader[Y] = new Reader[Y] { inner ⇒
-      def read: Option[Y] = ə.read match {
+  def flatMap[Y](f: (X ⇒ Enumerable[Y])) = new Enumerable[Y] {
+    val e: Enumerator[X] = outer.newEnumerator
+    var ə: Enumerator[Y] = Enumerator.empty
+    def newEnumerator: Enumerator[Y] = new Enumerator[Y] { inner ⇒
+      def next: Option[Y] = ə.next match {
         case Some(y) ⇒ Some(y)
-        case None ⇒ e.read match {
+        case None ⇒ e.next match {
           case Some(x) ⇒ {
             ə = f(x).newEnumerator
-            ə.read match {
+            ə.next match {
               case Some(y) ⇒ Some(y)
-              case None ⇒ inner.read
+              case None ⇒ inner.next
             }
           }
           case None ⇒ None
