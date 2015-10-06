@@ -7,58 +7,42 @@ trait Enumerable[+X] extends HasForeach[X] { outer ⇒
 
   def newEnumerator: Enumerator[X]
 
-  def isEmpty: Boolean = ???
-
   def foreach[Y](f: (X ⇒ Y)): Unit = {
-    val e = newEnumerator
-    while (e.moveNext()) {
-      f(e.current)
+    val e = outer.newEnumerator
+    while (true) {
+      e.next match {
+        case Some(x) ⇒ f(x)
+        case None ⇒ return
+      }
     }
   }
 
-  def map[Y](f: X ⇒ Y): Enumerable[Y] = new Enumerable[Y] {
+  def map[Y](f: (X ⇒ Y)): Enumerable[Y] = new Enumerable[Y] {
     val e = outer.newEnumerator
     def newEnumerator: Enumerator[Y] = new Enumerator[Y] {
-      def moveNext(): Boolean = e.moveNext()
-      def current: Y = f(e.current)
+      def next: Option[Y] = e.next.map(f)
     }
   }
 
-  def flatMap[Y](f: X ⇒ Enumerable[Y]) = new Enumerable[Y] {
-    def newEnumerator: Enumerator[Y] = outer.newEnumerator.flatMap[Y](x ⇒ f(x).newEnumerator)
+  def flatMap[Y](f: (X ⇒ Enumerable[Y])) = new Enumerable[Y] {
+    val e: Enumerator[X] = outer.newEnumerator
+    var ə: Enumerator[Y] = Enumerator.empty
+    def newEnumerator: Enumerator[Y] = new Enumerator[Y] { inner ⇒
+      def next: Option[Y] = ə.next match {
+        case Some(y) ⇒ Some(y)
+        case None ⇒ e.next match {
+          case Some(x) ⇒ {
+            ə = f(x).newEnumerator
+            ə.next match {
+              case Some(y) ⇒ Some(y)
+              case None ⇒ inner.next
+            }
+          }
+          case None ⇒ None
+        }
+      }
+    }
   }
-
-  def where(p: X ⇒ Boolean) = new Enumerable[X] {
-    def newEnumerator: Enumerator[X] = outer.newEnumerator.where(p)
-  }
-
-  def whereNot(p: X ⇒ Boolean) = where(a => !p(a))
-
-  def prepend[Y >: X](y: Y): Enumerable[Y] = new Enumerable[Y] {
-    def newEnumerator: Enumerator[Y] = outer.newEnumerator.prepend(y)
-  }
-
-  def append[Y >: X](y: Y): Enumerable[Y] = new Enumerable[Y] {
-    def newEnumerator: Enumerator[Y] = outer.newEnumerator.append(y)
-  }
-
-  def take(n: Int): Enumerable[X] = new Enumerable[X] {
-    def newEnumerator: Enumerator[X] = outer.newEnumerator.take(n)
-  }
-
-  def skip(n: Int): Enumerable[X] = new Enumerable[X] {
-    def newEnumerator: Enumerator[X] = outer.newEnumerator.skip(n)
-  }
-
-  def slice(start: Int, end: Int): Enumerable[X] = new Enumerable[X] {
-    def newEnumerator: Enumerator[X] = outer.newEnumerator.slice(start, end)
-  }
-
-  def window(size: Int): Enumerable[X] = new Enumerable[X] {
-    def newEnumerator: Enumerator[X] = ???
-  }
-
-  def partition(p: X ⇒ Boolean): (Enumerable[X], Enumerable[X]) = ???
 
 
   def str: String = {
