@@ -7,6 +7,8 @@ trait Enumerable[+X] extends HasForeach[X] { outer ⇒
 
   def newEnumerator: Enumerator[X]
 
+  def isEmpty: Boolean = ???
+
   def foreach[Y](f: (X ⇒ Y)): Unit = {
     val e = newEnumerator
     while (e.moveNext()) {
@@ -15,7 +17,11 @@ trait Enumerable[+X] extends HasForeach[X] { outer ⇒
   }
 
   def map[Y](f: X ⇒ Y): Enumerable[Y] = new Enumerable[Y] {
-    def newEnumerator: Enumerator[Y] = outer.newEnumerator.map(f)
+    val e = outer.newEnumerator
+    def newEnumerator: Enumerator[Y] = new Enumerator[Y] {
+      def moveNext(): Boolean = e.moveNext()
+      def current: Y = f(e.current)
+    }
   }
 
   def flatMap[Y](f: X ⇒ Enumerable[Y]) = new Enumerable[Y] {
@@ -51,6 +57,9 @@ trait Enumerable[+X] extends HasForeach[X] { outer ⇒
   def window(size: Int): Enumerable[X] = new Enumerable[X] {
     def newEnumerator: Enumerator[X] = ???
   }
+
+  def partition(p: X ⇒ Boolean): (Enumerable[X], Enumerable[X]) = ???
+
 
   def str: String = {
     val sb = new StringBuilder()

@@ -63,6 +63,19 @@ trait Enumerator[+X] { outer ⇒
   def scanLeft[Y](y: Y)(f: (Y, X) ⇒ Y): Enumerator[Y] = ???
   def scanRight[Y](f: (X, Y) ⇒ Y)(y: Y): Enumerator[Y] = ???
 
+  def partition(p: X ⇒ Boolean): (Enumerator[X], Enumerator[X]) = ???
+
+  //def cartesianProduct(that: Enumerator[X]): Enumerator[X] = ???
+
+
+  def forall(p: X ⇒ Boolean): Boolean = ???
+  def ∀(p: X ⇒ Boolean) = forall(p)
+
+  def exists(p: X ⇒ Boolean): Boolean = ???
+  def ∃(p: X ⇒ Boolean) = exists(p)
+
+  def find(p: X ⇒ Boolean): Option[X] = ???
+
   def prepend[Y >: X](y: Y): Enumerator[Y] = new Enumerator[Y] {
     var isInOriginalRange = false
     var cur: Y = _
@@ -112,8 +125,10 @@ trait Enumerator[+X] { outer ⇒
     def current: X = outer.current
   }
 
-  def skip(n: Int): Enumerator[X] = new Enumerator[X] {
+  def takeWhile(p: X ⇒ Boolean): Enumerator[X] = ???
+  def takeUntil(p: X ⇒ Boolean): Enumerator[X] = ???
 
+  def skip(n: Int): Enumerator[X] = new Enumerator[X] {
     var isFirstMove = true
 
     def moveNext(): Boolean = {
@@ -132,7 +147,12 @@ trait Enumerator[+X] { outer ⇒
     def current: X = outer.current
   }
 
+  def skipWhile(p: X ⇒ Boolean): Enumerator[X] = ???
+  def skipUntil(p: X ⇒ Boolean): Enumerator[X] = ???
+
   def slice(start: Int, end: Int): Enumerator[X] = outer.skip(start).take(end - 1)
+
+  def splitBy[Y >: X](y: Y): (Enumerator[X], Enumerator[X]) = ???
 
   def window(size: Int): Enumerator[X] = ???
 
