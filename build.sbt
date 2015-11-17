@@ -1,6 +1,6 @@
 name := "ycoll"
 
-version := "0.0.2-SNAPSHOT"
+version := "0.0.5-SNAPSHOT"
 
 organization := "me.yuhuan"
 
@@ -21,7 +21,8 @@ publishTo := {
 }
 
 resolvers += Resolver.sonatypeRepo("snapshots")
-libraryDependencies += "me.yuhuan" %% "yalg" % "0.0.1-SNAPSHOT"
+libraryDependencies += "me.yuhuan" %% "yalg"     % "0.0.1-SNAPSHOT"
+libraryDependencies += "me.yuhuan" %% "marauder" % "0.0.5-SNAPSHOT"
 
 
 
