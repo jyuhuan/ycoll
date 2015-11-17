@@ -50,7 +50,7 @@ import scala.language.higherKinds
  * @tparam N The type of the data in an vertex.
  * @tparam E The type of the data of an edge.
  */
-class AdjacencyMapGraph[K, N, E] private(nodeMap: mutable.HashMap[K, N], edgeMap: mutable.HashMap[K, mutable.ListMap[K, E]])
+class AdjacencyMapGraph[K, N, E] private(val nodeMap: mutable.HashMap[K, N], val edgeMap: mutable.HashMap[K, mutable.ListMap[K, E]])
   extends StructureMutableGraph[K, N, E] { outer ⇒
 
   def apply(i: K) = nodeMap(i)
@@ -61,7 +61,7 @@ class AdjacencyMapGraph[K, N, E] private(nodeMap: mutable.HashMap[K, N], edgeMap
 
   def update(i: K, v: N): Unit = nodeMap(i) = v
 
-  def nodeKeys = nodeMap.keySet
+  def nodeKeys = nodeMap.keys
 
   def edgeKeys = {
 
@@ -79,18 +79,18 @@ class AdjacencyMapGraph[K, N, E] private(nodeMap: mutable.HashMap[K, N], edgeMap
 //    result.toSet
 
 
-    edgeMap.toSeq.flatMap(p ⇒ p._2.toSeq.map(q ⇒ p._1 → q._1)).toSet
+    edgeMap.toSeq.flatMap(p ⇒ p._2.toSeq.map(q ⇒ p._1 → q._1))
 
   }
 
-  def outgoingNodeKeysOf(i: K): Set[K] = {
-    if (!edgeMap.contains(i)) Set()
-    else edgeMap(i).keySet
+  def outgoingNodeKeysOf(i: K): Iterable[K] = {
+    if (!edgeMap.contains(i)) Nil
+    else edgeMap(i).keys
   }
 
   override def outgoingEdgeKeysOf(i: K) = {
-    if (!edgeMap.contains(i)) Set()
-    else edgeMap(i).map(p ⇒ i → p._1).toSet
+    if (!edgeMap.contains(i)) Nil
+    else edgeMap(i).toSeq.map(p ⇒ i → p._1)
   }
 
   def edgeFromTo(i: K, j: K): E = {

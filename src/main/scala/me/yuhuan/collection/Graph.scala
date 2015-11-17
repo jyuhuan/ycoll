@@ -2,8 +2,11 @@ package me.yuhuan.collection
 
 import me.yuhuan.collection
 import me.yuhuan.collection.builder.GraphBuilder
+import me.yuhuan.marauder._
+import me.yuhuan.marauder._
 import me.yuhuan.strategy.format.StringFormatter
 
+import scala._
 import scala.annotation.unchecked.{uncheckedVariance ⇒ uv}
 import scala.language.higherKinds
 
@@ -54,13 +57,13 @@ trait Graph[@specialized(Int) K, +N, +E] { outer ⇒
    * Gets the indices of all vertices.
    * @return A set of indices of all vertices.
    */
-  def nodeKeys: scala.collection.Set[K]
+  def nodeKeys: scala.collection.Iterable[K]
 
   /**
    * Gets the index pairs of all edges.
    * @return A set of index pairs of all edges.
    */
-  def edgeKeys: scala.collection.Set[(K, K)]
+  def edgeKeys: scala.collection.Iterable[(K, K)]
 
   /**
    * Gets the vertex objects of all vertices.
@@ -79,28 +82,28 @@ trait Graph[@specialized(Int) K, +N, +E] { outer ⇒
    * @param i The index of the vertex queried.
    * @return A set of indices of all outgoing vertices of the vertex queried.
    */
-  def outgoingNodeKeysOf(i: K): scala.collection.Set[K]
+  def outgoingNodeKeysOf(i: K): scala.collection.Iterable[K]
 
   /**
    *
    * @param i
    * @return
    */
-  def outgoingEdgeKeysOf(i: K): scala.collection.Set[(K, K)]
+  def outgoingEdgeKeysOf(i: K): scala.collection.Iterable[(K, K)]
 
   /**
    * Gets the vertex objects of the outgoing vertices of the vertex at the given index.
    * @param i The index of the vertex queried.
    * @return A set of vertex objects of all outgoing vertices of the vertex queried.
    */
-  def outgoingNodesOf(i: K): scala.collection.Set[Node] = outgoingNodeKeysOf(i).map(v ⇒ nodeAt(v))
+  def outgoingNodesOf(i: K): scala.collection.Iterable[Node] = outgoingNodeKeysOf(i).map(v ⇒ nodeAt(v))
 
   /**
    * Gets the edge objects of the outgoing vertices of the vertex at the given index.
    * @param i The index of the vertex queried.
    * @return A set of edge objects of all outgoing vertices of the vertex queried.
    */
-  def outgoingEdgesOf(i: K): scala.collection.Set[Edge] = outgoingEdgeKeysOf(i).map(e ⇒ edgeAt(e._1, e._2))
+  def outgoingEdgesOf(i: K): scala.collection.Iterable[Edge] = outgoingEdgeKeysOf(i).map(e ⇒ edgeAt(e._1, e._2))
 
   /**
    * The out degree of the vertex at the given index.
@@ -111,92 +114,100 @@ trait Graph[@specialized(Int) K, +N, +E] { outer ⇒
 
   def str(implicit f: StringFormatter[Graph[K, N, E]]) = f.str(this)
 
+  def pathBetween(i: K, j: K): Path[K, E] = {
 
-  def mapNodes[V2](f: N ⇒ V2): Graph[K, V2, E] = new Graph[K, V2, E] {
-    override def apply(i: K): V2 = f(outer.apply(i))
-    override def apply(i: K, j: K): E = outer.apply(i, j)
-
-    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
-    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
-
-    override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
-    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
-  }
-
-  def mapEdges[E2](f: E ⇒ E2): Graph[K, N, E2] = new Graph[K, N, E2] {
-    override def apply(i: K): N = outer.apply(i)
-    override def apply(i: K, j: K): E2 = f(outer.apply(i, j))
-
-    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
-    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
-
-    override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
-    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
-  }
-
-
-  def filterNodes(f: N ⇒ Boolean): Graph[K, N, E] = new Graph[K, N, E] {
-
-    override def apply(i: K): N = outer.apply(i)
-
-
-    override def apply(i: K, j: K) = outer.apply(i, j)
-
-    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys.filter(p ⇒ f(apply(p._1)) && f(apply(p._2)))
-    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys.filter(p ⇒ f(apply(p)))
-
-    override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
-    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
-  }
-
-  def filterEdges(f: E ⇒ Boolean): Graph[K, N, E] = new Graph[K, N, E] {
-    override def apply(i: K): N = outer.apply(i)
-
-    override def apply(i: K, j: K) = {
-      if (!f(outer.edgeAt(i, i).data)) throw new Exception(s"Vertex $i does not exist!")
-      else if (!f(outer.edgeAt(i, i).data)) throw new Exception(s"Vertex $j does not exist!")
-      else outer.apply(i, j)
+    val StateSpace = new StateSpaceWithLazyAction[K, E] {
+      def succ(s: K, a: E): scala.Seq[K] = outer.outgoingEdgesOf(s).find(_.data == a).map(_.vj.id).toSeq
+      def succAction(s: K): scala.Seq[E] = outer.outgoingEdgesOf(s).map(_.data).toSeq
     }
-
-    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys.filter(p ⇒ f(apply(p._1, p._2)))
-    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
-
-    override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
-    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
+    GraphSearch.depthFirstWithLazyAction(i, (k: K) => k == j)(StateSpace)
   }
 
-  def zip[V2, E2](that: Graph[K, V2, E2]): Graph[K, (N, V2), (E, E2)] = new Graph[K, (N, V2), (E, E2)] {
-    override def apply(i: K): (N, V2) = (outer(i), that(i))
-    override def apply(i: K, j: K): (E, E2) = (outer(i, j), that(i, j))
-
-    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
-    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
-
-    override def outgoingEdgeKeysOf(i: K): scala.collection.Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
-    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
-  }
-
-  def zipNodes[V2, E2](that: Graph[K, V2, E2]): Graph[K, (N, V2), E] = new Graph[K, (N, V2), E] {
-    override def apply(i: K): (N, V2) = (outer(i), that(i))
-    override def apply(i: K, j: K): E = outer(i, j)
-
-    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
-    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
-
-    override def outgoingEdgeKeysOf(i: K): scala.collection.Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
-    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
-  }
-
-  def zipEdges[V2, E2](that: Graph[K, V2, E2]): Graph[K, N, (E, E2)] = new Graph[K, N, (E, E2)] {
-    override def apply(i: K): N = outer(i)
-    override def apply(i: K, j: K): (E, E2) = (outer(i, j), that(i, j))
-
-    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
-    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
-
-    override def outgoingEdgeKeysOf(i: K): scala.collection.Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
-    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
-  }
+//  def mapNodes[V2](f: N ⇒ V2): Graph[K, V2, E] = new Graph[K, V2, E] {
+//    override def apply(i: K): V2 = f(outer.apply(i))
+//    override def apply(i: K, j: K): E = outer.apply(i, j)
+//
+//    override def edgeKeys: scala.collection.Seq[(K, K)] = outer.edgeKeys
+//    override def nodeKeys: scala.collection.Seq[K] = outer.nodeKeys
+//
+//    override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
+//    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
+//  }
+//
+//  def mapEdges[E2](f: E ⇒ E2): Graph[K, N, E2] = new Graph[K, N, E2] {
+//    override def apply(i: K): N = outer.apply(i)
+//    override def apply(i: K, j: K): E2 = f(outer.apply(i, j))
+//
+//    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
+//    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
+//
+//    override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
+//    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
+//  }
+//
+//
+//  def filterNodes(f: N ⇒ Boolean): Graph[K, N, E] = new Graph[K, N, E] {
+//
+//    override def apply(i: K): N = outer.apply(i)
+//
+//
+//    override def apply(i: K, j: K) = outer.apply(i, j)
+//
+//    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys.filter(p ⇒ f(apply(p._1)) && f(apply(p._2)))
+//    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys.filter(p ⇒ f(apply(p)))
+//
+//    override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
+//    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
+//  }
+//
+//  def filterEdges(f: E ⇒ Boolean): Graph[K, N, E] = new Graph[K, N, E] {
+//    override def apply(i: K): N = outer.apply(i)
+//
+//    override def apply(i: K, j: K) = {
+//      if (!f(outer.edgeAt(i, i).data)) throw new Exception(s"Vertex $i does not exist!")
+//      else if (!f(outer.edgeAt(i, i).data)) throw new Exception(s"Vertex $j does not exist!")
+//      else outer.apply(i, j)
+//    }
+//
+//    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys.filter(p ⇒ f(apply(p._1, p._2)))
+//    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
+//
+//    override def outgoingEdgeKeysOf(i: K) = outer.outgoingEdgeKeysOf(i)
+//    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
+//  }
+//
+//  def zip[V2, E2](that: Graph[K, V2, E2]): Graph[K, (N, V2), (E, E2)] = new Graph[K, (N, V2), (E, E2)] {
+//    override def apply(i: K): (N, V2) = (outer(i), that(i))
+//    override def apply(i: K, j: K): (E, E2) = (outer(i, j), that(i, j))
+//
+//    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
+//    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
+//
+//    override def outgoingEdgeKeysOf(i: K): scala.collection.Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
+//    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
+//  }
+//
+//  def zipNodes[V2, E2](that: Graph[K, V2, E2]): Graph[K, (N, V2), E] = new Graph[K, (N, V2), E] {
+//    override def apply(i: K): (N, V2) = (outer(i), that(i))
+//    override def apply(i: K, j: K): E = outer(i, j)
+//
+//    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
+//    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
+//
+//    override def outgoingEdgeKeysOf(i: K): scala.collection.Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
+//    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
+//  }
+//
+//  def zipEdges[V2, E2](that: Graph[K, V2, E2]): Graph[K, N, (E, E2)] = new Graph[K, N, (E, E2)] {
+//    override def apply(i: K): N = outer(i)
+//    override def apply(i: K, j: K): (E, E2) = (outer(i, j), that(i, j))
+//
+//    override def edgeKeys: scala.collection.Set[(K, K)] = outer.edgeKeys
+//    override def nodeKeys: scala.collection.Set[K] = outer.nodeKeys
+//
+//    override def outgoingEdgeKeysOf(i: K): scala.collection.Set[(K, K)] = outer.outgoingEdgeKeysOf(i)
+//    override def outgoingNodeKeysOf(i: K): scala.collection.Set[K] = outer.outgoingNodeKeysOf(i)
+//  }
 
   override def hashCode: Int = ???
 
